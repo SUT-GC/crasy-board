@@ -1,17 +1,13 @@
 <template>
-  <div id="app">
-    hello World
-  </div>
+    <h1> hello World login </h1>
 </template>
 
 <script>
-
 export default {
-  name: 'App',
-  components: {
-  }
+    
 }
 </script>
 
 <style>
+
 </style>
