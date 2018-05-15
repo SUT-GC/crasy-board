@@ -1,0 +1,17 @@
+<template>
+    <div>
+        hello World
+    </div>
+</template>
+
+<script>
+
+export default {
+    name: 'Login',
+    components: {
+    }
+}
+</script>
+
+<style>
+</style>
