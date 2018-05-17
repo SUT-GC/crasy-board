@@ -8,6 +8,8 @@ class ResultUtils(object):
     def get_result(code, data=None):
         if not data:
             return json.dumps({'code': code, 'data': ''})
+        else:
+            return json.dumps({'code': code, 'data': data})
 
 if __name__ == "__main__":
     print ResultUtils.get_result(200)

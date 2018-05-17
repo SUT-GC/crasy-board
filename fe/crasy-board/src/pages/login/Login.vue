@@ -20,6 +20,9 @@
 </template>
 
 <script>
+
+import {setCookie, getCookie} from '../../utils/CookieUtils.js'
+
 export default {
     name: 'Login',
     data() {
@@ -49,6 +52,7 @@ export default {
                         let loginResult = response.data
                         console.log(loginResult)
                         if(loginResult && loginResult.code === 200) {
+                            setCookie(document, 'crasy-board-user', loginResult.data)
                             window.location.href="/index.html"
                         }
                     }, function(){
