@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>crasy board</title>
+        
+        <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+        <link rel="stylesheet" href="../static/css/login.css">
+    </head>
+    <body>
+        <div id="app">
+            <el-container>
+                <el-header class="login-header">Crasy Board 登陆</el-header>
+                <el-main>
+                    <el-card class="login-card" >
+                        <el-form status-icon label-width="100px" :model="loginForm" :rules="rules" ref="loginForm">
+                            <el-form-item label="账号" prop="username">
+                                <el-input  name="username" v-model="loginForm.username" ref="username" placeholder="请输入账号" clearable></el-input>
+                            </el-form-item>
+                            <el-form-item label="密码" prop="password">
+                                <el-input name="password" v-model="loginForm.password" ref="passworld" type="password" placeholder="请输入密码" auto-complete="off"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="submitLogin('loginForm')">立即登陆</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-card>
+                </el-main>
+            </el-container>
+        </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.0"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="../static/js/utils.js"></script>
+    <script src="../static/js/login.js"></script>
+</html>
