@@ -11,7 +11,8 @@ from flask import (
     Flask,
     url_for,
     redirect,
-    render_template
+    render_template,
+    send_file
 )
 
 from util.result_utils import (
@@ -33,14 +34,14 @@ def validate_login(func):
         if username in session and session[username] == username:
             return func()
         else:
-            return render_template('login.html')
+            return send_file('templates/login.html')
 
     return wrapper
 
 @app.route('/', methods=['GET'])
 @validate_login
 def index():
-    return render_template('index.html')
+    return send_file('templates/index.html')
 
 
 @app.route('/login/', methods=['POST'])
