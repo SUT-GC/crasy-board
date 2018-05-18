@@ -14,5 +14,3 @@ var getCookie = function(doc, key) {
     }  
     return "";  
 }
-
-export {setCookie, getCookie}
