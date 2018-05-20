@@ -1,6 +1,11 @@
 #! -*- coding:utf8 -*-
 
 import json
+import sys
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
+sys.path.append(".")
 
 from flask import (
     Blueprint,
@@ -23,6 +28,14 @@ from util.log_utils import (
     Log
 )
 
+from util.conf_utils import (
+    get_app_conf
+)
+
+from service.validate_service import (
+    validate_user
+)
+
 app = Flask(__name__)
 log = Log.getLog(__name__, isPrint=True)
 
@@ -34,7 +47,6 @@ def validate_login():
         return True
     else:
         return False
-
 
 
 @app.route('/', methods=['GET'])
@@ -65,12 +77,13 @@ def login():
     user_name = data.get('username', None)
     pass_word = data.get('password', None)
 
-    print user_name, pass_word
-    
-    session[user_name] = user_name
-    print session
+    if validate_user(user_name, pass_word):
+        session[user_name] = user_name
+        print session
 
-    return ResultUtils.get_result(200, user_name)
+        return ResultUtils.get_result(200, user_name)
+    else:
+        return ResultUtils.get_result(403, '账号或者密码不正确')
     
 
 @app.route('/logout/', methods=['POST'])
@@ -86,5 +99,6 @@ def logout():
     return ResultUtils.get_result(200, '退出成功')
 
 if __name__ == "__main__":
-    app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+    app_conf = get_app_conf()
+    app.secret_key = app_conf['secret_key']
     app.run(debug=True)

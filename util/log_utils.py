@@ -5,26 +5,15 @@ import logging
 import logging.handlers
 import datetime
 
-log_path = '/data/log/crasy-board/'
-log_level = 'DEBUG'
-
-class LogConfig(object):
-
-    @classmethod
-    def get_log_level(cls):
-        global log_level
-        return log_level
-
-    @classmethod
-    def get_log_path(cls):
-        global log_path
-        return log_path
-
+from conf_utils import (
+    get_log_conf
+)
 
 class Log(object):
-
-    log_path = LogConfig.get_log_path()
-    log_level = LogConfig.get_log_level()
+    log_conf = get_log_conf()
+    log_path = log_conf['log_path']
+    log_level = log_conf['log_level']
+    
     log_file_path = "%saccess-%s.log" % (log_path, datetime.datetime.now().strftime("%y%m%d"))
 
     @classmethod

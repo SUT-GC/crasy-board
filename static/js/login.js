@@ -20,15 +20,15 @@ var app = new Vue({
                 if (valid) {
                     this.$http.post("/login/", JSON.stringify(this.loginForm)).then(function(response) {
                         let loginResult = response.data
-                        console.log('00000', loginResult)
+                        console.log(loginResult)
                         if(loginResult && loginResult.code === 200) {
-                            console.log('111111')
                             setCookie(document, 'crasy-board-user', loginResult.data)
-                            console.log('222222')
                             window.location.href="/index/"
+                        }else{
+                            this.$alert('账号密码不正确，请确认后重新输入', '登陆异常')
                         }
                     }, function(){
-                        alert('服务异常, 请稍后再试')
+                        
                     })
                 } else {
                     console.log('error submit!!');
