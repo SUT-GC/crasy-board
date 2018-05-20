@@ -26,26 +26,39 @@ from util.log_utils import (
 app = Flask(__name__)
 log = Log.getLog(__name__, isPrint=True)
 
-def validate_login(func):
-    def wrapper():
-        log.info('validate login session:%s, cookit:%s' % (session, request.cookies))
+def validate_login():
+    log.info('validate login session:%s, cookit:%s' % (session, request.cookies))
 
-        username = request.cookies.get('crasy-board-user')
-        if username in session and session[username] == username:
-            return func()
-        else:
-            return send_file('templates/login.html')
+    username = request.cookies.get('crasy-board-user')
+    if username in session and session[username] == username:
+        return True
+    else:
+        return False
 
-    return wrapper
+
 
 @app.route('/', methods=['GET'])
-@validate_login
+def root():
+    log.info('request root')
+    if validate_login():
+        return send_file('templates/index.html')
+    else:
+        return send_file('templates/login.html')
+
+@app.route('/index/', methods=['GET'])
 def index():
-    return send_file('templates/index.html')
+    log.info('request index')
+    if validate_login():
+        return send_file('templates/index.html')
+    else:
+        return send_file('templates/login.html')
 
 
-@app.route('/login/', methods=['POST'])
+@app.route('/login/', methods=['POST', 'GET'])
 def login():
+    if request.method == 'GET':
+        return send_file('templates/login.html')
+
     data = request.data
     data = json.loads(data) if data else {}
 

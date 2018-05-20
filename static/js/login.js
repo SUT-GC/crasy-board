@@ -20,10 +20,12 @@ var app = new Vue({
                 if (valid) {
                     this.$http.post("/login/", JSON.stringify(this.loginForm)).then(function(response) {
                         let loginResult = response.data
-                        console.log(loginResult)
+                        console.log('00000', loginResult)
                         if(loginResult && loginResult.code === 200) {
+                            console.log('111111')
                             setCookie(document, 'crasy-board-user', loginResult.data)
-                            window.location.href="/"
+                            console.log('222222')
+                            window.location.href="/index/"
                         }
                     }, function(){
                         alert('服务异常, 请稍后再试')
