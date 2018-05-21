@@ -51,6 +51,9 @@ var app = new Vue({
         },
         netLineSettings:{}
     },
+    computed: {
+        
+    },
     methods: {
         handleOpen(key, keyPath) {
             console.log(key, keyPath);
@@ -72,6 +75,25 @@ var app = new Vue({
             }, function(response){
 
             });
+        },
+        countDashboardCpuTime() {
+            console.log('count cpu time')
+            this.cpuData.rows = []
+            let getCpuTimeMethod = this.getDashboardCpuTime
+            setInterval(function(){
+                getCpuTimeMethod()
+            }, 1000)
+            
+        },
+        getDashboardCpuTime() {
+            this.$http.get("/data/dashboard/").then(function(response){
+                let responseData = response.body.data
+                this.cpuData.rows = [{ '类型': '空闲中', '大小': responseData.cpu_data.user_time},{ '类型': '使用中', '大小': responseData.cpu_data.idle_time}]
+            }, function(response){
+                console.log('服务异常', response)
+            });
         }
-    }
+    },
 })
+
+app.countDashboardCpuTime()

@@ -36,6 +36,10 @@ from service.validate_service import (
     validate_user
 )
 
+from service.cpu_service import (
+    get_totle_cpu_times
+)
+
 app = Flask(__name__)
 log = Log.getLog(__name__, isPrint=True)
 
@@ -97,6 +101,19 @@ def logout():
     log.info('after logout session is :%s' % session)
 
     return ResultUtils.get_result(200, '退出成功')
+
+
+@app.route('/data/dashboard/', methods=['GET'])
+def data_dashboard():
+    log.info('data dashboard')
+    if validate_login():
+        cpu_data = get_totle_cpu_times()
+        
+        return ResultUtils.get_result(200, {'cpu_data': cpu_data})
+    else:
+        
+        return send_file('templates/login.html')
+
 
 if __name__ == "__main__":
     app_conf = get_app_conf()
