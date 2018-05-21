@@ -1,8 +1,8 @@
 var app = new Vue({
     el: "#index",
     data: {
-        refreshMT: 5000,
-        diskData: {
+        message: "hello world",
+        cpuData: {
             columns: ['类型', '大小'],
             rows: [
                 { '类型': '空闲中', '大小': 1523},
