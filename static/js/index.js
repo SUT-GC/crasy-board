@@ -1,15 +1,15 @@
 var app = new Vue({
     el: "#index",
     data: {
-        message: "hello world",
-        cpuData: {
+        refreshMT: 5000,
+        diskData: {
             columns: ['类型', '大小'],
             rows: [
                 { '类型': '空闲中', '大小': 1523},
                 { '类型': '使用中', '大小': 1223},
             ]
         },
-        cpuChartSettings: {
+        diskChartSettings: {
             dimension: '类型',
             radius: 120,
             offsetY: 220,
@@ -26,30 +26,29 @@ var app = new Vue({
             radius: 120,
             offsetY: 220,
         },
-        storageData: {
-            columns: ['日期', '销售额-1季度', '销售额-2季度', '占比', '其他'],
+        cpuData: {
+            columns: ['时间', '使用率'],
             rows: [
-                { '日期': '1月1日', '销售额-1季度': 1523, '销售额-2季度': 1523, '占比': 0.12, '其他': 100 },
-                { '日期': '1月2日', '销售额-1季度': 1223, '销售额-2季度': 1523, '占比': 0.345, '其他': 100 },
-                { '日期': '1月3日', '销售额-1季度': 2123, '销售额-2季度': 1523, '占比': 0.7, '其他': 100 },
-                { '日期': '1月4日', '销售额-1季度': 4123, '销售额-2季度': 1523, '占比': 0.31, '其他': 100 },
-                { '日期': '1月5日', '销售额-1季度': 3123, '销售额-2季度': 1523, '占比': 0.12, '其他': 100 },
-                { '日期': '1月6日', '销售额-1季度': 7123, '销售额-2季度': 1523, '占比': 0.65, '其他': 100 }
+                { '时间': '1月1日', '使用率': 50},
+                { '时间': '1月1日', '使用率': 50}
             ]
         },
-        storageLineSettings:{},
+        cpuLineSettings:{
+            area: true,
+            yAxisType: ['percent']
+        },
+        lastCpuIdle: 0,
+        lastCpuAll: 0,
         netData: {
-            columns: ['日期', '销售额-1季度', '销售额-2季度', '占比', '其他'],
+            columns: ['时间', '收到数据'],
             rows: [
-                { '日期': '1月1日', '销售额-1季度': 1523, '销售额-2季度': 1523, '占比': 0.12, '其他': 100 },
-                { '日期': '1月2日', '销售额-1季度': 1223, '销售额-2季度': 1523, '占比': 0.345, '其他': 100 },
-                { '日期': '1月3日', '销售额-1季度': 2123, '销售额-2季度': 1523, '占比': 0.7, '其他': 100 },
-                { '日期': '1月4日', '销售额-1季度': 4123, '销售额-2季度': 1523, '占比': 0.31, '其他': 100 },
-                { '日期': '1月5日', '销售额-1季度': 3123, '销售额-2季度': 1523, '占比': 0.12, '其他': 100 },
-                { '日期': '1月6日', '销售额-1季度': 7123, '销售额-2季度': 1523, '占比': 0.65, '其他': 100 }
+                { '时间': '1月1日', '收到数据': 50},
             ]
         },
-        netLineSettings:{}
+        netLineSettings:{
+            area: true,
+            yAxisName: ['GB']
+        }
     },
     computed: {
         
@@ -78,20 +77,57 @@ var app = new Vue({
         },
         countDashboardCpuTime() {
             console.log('count cpu time')
+            this.diskData.rows = []
+            this.ramData.rows = []
             this.cpuData.rows = []
+            this.netData.rows = []
+
             let getCpuTimeMethod = this.getDashboardCpuTime
+            getCpuTimeMethod()
+
             setInterval(function(){
                 getCpuTimeMethod()
-            }, 1000)
+            }, this.refreshMT)
             
         },
         getDashboardCpuTime() {
             this.$http.get("/data/dashboard/").then(function(response){
                 let responseData = response.body.data
-                this.cpuData.rows = [{ '类型': '空闲中', '大小': responseData.cpu_data.user_time},{ '类型': '使用中', '大小': responseData.cpu_data.idle_time}]
+                let responseCpuData = responseData.cpu_data
+                let responseVmData = responseData.vm_data
+                let responseDiskData = responseData.disk_data 
+                let responseNetData = responseData.net_data
+                
+                this.diskData.rows = [ { '类型': '空闲中', '大小': responseDiskData.disk_free}, { '类型': '使用中', '大小': responseDiskData.disk_totle - responseDiskData.disk_free}]
+                this.ramData.rows = [ { '类型': '空闲中', '大小': responseVmData.vm_available},{ '类型': '使用中', '大小': responseVmData.vm_totle - responseVmData.vm_available}]
+                this.calculateCpuData(responseCpuData)
+                this.calculateNetData(responseNetData)
+
             }, function(response){
                 console.log('服务异常', response)
             });
+        },
+        calculateCpuData(responseCpuData){
+            let date = new Date()
+            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+            if(this.cpuData.rows.length <= 0){
+                this.cpuData.rows.push({ '时间': timeString, '使用率': 0.0})
+            }else if(this.cpuData.rows.length > 10){
+                this.cpuData.rows.shift()
+            }else{
+                this.cpuData.rows.push({ '时间': timeString, '使用率': (responseCpuData.cpu_usage/100)})
+            }
+        },
+        calculateNetData(responseNetData){
+            let date = new Date()
+            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+            if(this.netData.rows.length <= 0){
+                this.netData.rows.push({ '时间': timeString, '收到数据': 0.0})
+            }else if(this.netData.rows.length > 10){
+                this.netData.rows.shift()
+            }else{
+                this.netData.rows.push({ '时间': timeString, '收到数据': (responseNetData.bytes_recv/1024/1024/1024)})
+            }
         }
     },
 })

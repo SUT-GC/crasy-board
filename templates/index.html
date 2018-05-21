@@ -43,9 +43,9 @@
                 <div class="index-right">
                     <el-card class="one-card dash-board-cpu-use">
                         <div class="card-title">
-                            <span>CPU使用情况</span>
+                            <span>磁盘使用情况</span>
                         </div>
-                        <ve-pie :data="cpuData" :settings="cpuChartSettings"></ve-pie>
+                        <ve-pie :data="diskData" :settings="diskChartSettings"></ve-pie>
                     </el-card>
                     <el-card class="one-card dash-board-ram-use">
                         <div class="card-title">
@@ -55,9 +55,9 @@
                     </el-card>
                     <el-card class="one-card dash-board-storage-use">
                         <div class="card-title">
-                            <span>磁盘使用情况</span>
+                            <span>CPU使用情况</span>
                         </div>
-                        <ve-line :data="storageData" :settings="storageLineSettings"></ve-line>
+                        <ve-line :data="cpuData" :settings="cpuLineSettings"></ve-line>
                     </el-card>
                     <el-card class="one-card dash-board-net-use">
                         <div class="card-title">

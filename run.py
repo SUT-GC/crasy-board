@@ -37,7 +37,19 @@ from service.validate_service import (
 )
 
 from service.cpu_service import (
-    get_totle_cpu_times
+    get_totle_cpu_info,
+)
+
+from service.memory_service import (
+    get_totle_vm_info
+)
+
+from service.disk_service import (
+    get_totle_disk_info
+)
+
+from service.net_service import (
+    get_total_net_info
 )
 
 app = Flask(__name__)
@@ -107,9 +119,15 @@ def logout():
 def data_dashboard():
     log.info('data dashboard')
     if validate_login():
-        cpu_data = get_totle_cpu_times()
-        
-        return ResultUtils.get_result(200, {'cpu_data': cpu_data})
+        cpu_data = get_totle_cpu_info()
+        vm_data = get_totle_vm_info()
+        disk_data = get_totle_disk_info()
+        net_data = get_total_net_info()
+
+        result_data = {'cpu_data': cpu_data, 'vm_data': vm_data, 'disk_data': disk_data, 'net_data': net_data}
+        log.info('data dashboard result: %s' % result_data)
+
+        return ResultUtils.get_result(200, result_data)
     else:
         
         return send_file('templates/login.html')
