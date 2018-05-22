@@ -36,7 +36,7 @@ var app = new Vue({
         },
         cpuLineSettings:{
             area: true,
-            yAxisType: ['percent']
+            yAxisType: ['percent'],
         },
         lastCpuIdle: 0,
         lastCpuAll: 0,
@@ -48,11 +48,26 @@ var app = new Vue({
         },
         netLineSettings:{
             area: true,
-            yAxisName: ['MB']
+            yAxisName: ['MB'],
+            label: {
+                normal: {
+                    show: true
+                }
+            }
         },
-        dashBoardShow: true
+        dashBoardShow: true,
         // 以上变量跟DashBoard里面的展示有关
+        cpuBoardShow: false,
+        cpuBoardData: {
+            cpuPercentData: {
+                columns: [],
+                rows: [
+                ]
+            },
+            cpuPrecentSetting: {
 
+            }
+        }
     },
     computed: {
         
@@ -134,13 +149,54 @@ var app = new Vue({
             }else if(this.netData.rows.length > 10){
                 this.netData.rows.shift()
             }else{
-                this.netData.rows.push({ '时间': timeString, '收到数据': (responseNetData.bytes_recv/1024/1024)})
+                this.netData.rows.push({ '时间': timeString, '收到数据': parseInt(responseNetData.bytes_recv/1024/1024, 10)})
+            }
+        },
+        fillCpuBoardInfo(){
+            let getCpuBoardAllData = this.getCpuBoardData
+            setInterval(function(){
+                getCpuBoardAllData()
+            }, this.refreshMT)
+        },
+        getCpuBoardData(){
+            if (!this.cpuBoardShow) {
+                return
+            }
+
+            this.$http.get("/data/cpudashboard/").then(function(response){
+                let responseData = response.body.data
+                let responseCpuData = responseData.cpu_data
+
+                this.fillCpuPercentData(responseCpuData.eve_cpu_persent)
+
+            }, function(response){
+                console.log('服务异常', response)
+            });
+        },
+        fillCpuPercentData(eveCpuPercent){
+            console.log(eveCpuPercent)
+            if (this.cpuBoardData.columns.length == 0){
+                this.cpuBoardData.columns.push('时间')
+                for(let i = 0; i < eveCpuPercent.length; i++){
+                    this.cpuBoardData.columns.push('CPU-'+ (i+1))
+                }
+            }
+
+            let date = new Date()
+            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+            let oneRecord = {'时间': timeString}
+
+            for(let i = 0; i < eveCpuPercent.length; i++){
+                this.cpuBoardData.columns.push('CPU-'+ (i+1))
             }
         },
         selectMenuHandler(key, keypath){
             if (key == 1) {
                 this.dashBoardShow = true
-            }else {
+                this.cpuBoardShow = false
+            }else if(key == 2) {
+                this.fillCpuBoardInfo()
+                this.cpuBoardShow = true
                 this.dashBoardShow = false
             }
         }

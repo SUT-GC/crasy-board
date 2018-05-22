@@ -38,6 +38,7 @@ from service.validate_service import (
 
 from service.cpu_service import (
     get_totle_cpu_info,
+    get_cpu_info,
 )
 
 from service.memory_service import (
@@ -132,6 +133,19 @@ def data_dashboard():
         
         return send_file('templates/login.html')
 
+@app.route('/data/cpudashboard/', methods=['GET'])
+def cpu_dashboard():
+    log.info('cpu dashboard')
+    if validate_login():
+        cpu_data = get_cpu_info()
+
+        result_data = {'cpu_data': cpu_data}
+        log.info('cpu dashboard result: %s' % result_data)
+
+        return ResultUtils.get_result(200, result_data)
+    else:
+        
+        return send_file('templates/login.html')
 
 if __name__ == "__main__":
     app_conf = get_app_conf()
