@@ -1,8 +1,9 @@
 var app = new Vue({
     el: "#index",
     data: {
+        refreshMT: 5000,
         message: "hello world",
-        cpuData: {
+        diskData: {
             columns: ['类型', '大小'],
             rows: [
                 { '类型': '空闲中', '大小': 1523},
@@ -47,8 +48,11 @@ var app = new Vue({
         },
         netLineSettings:{
             area: true,
-            yAxisName: ['GB']
-        }
+            yAxisName: ['MB']
+        },
+        dashBoardShow: true
+        // 以上变量跟DashBoard里面的展示有关
+
     },
     computed: {
         
@@ -82,15 +86,19 @@ var app = new Vue({
             this.cpuData.rows = []
             this.netData.rows = []
 
-            let getCpuTimeMethod = this.getDashboardCpuTime
-            getCpuTimeMethod()
+            let getDashboardAllData = this.getDashboardInfo
+            getDashboardAllData()
 
             setInterval(function(){
-                getCpuTimeMethod()
+                getDashboardAllData()
             }, this.refreshMT)
             
         },
-        getDashboardCpuTime() {
+        getDashboardInfo() {
+            if (!this.dashBoardShow) {
+                return 
+            }
+
             this.$http.get("/data/dashboard/").then(function(response){
                 let responseData = response.body.data
                 let responseCpuData = responseData.cpu_data
@@ -126,7 +134,14 @@ var app = new Vue({
             }else if(this.netData.rows.length > 10){
                 this.netData.rows.shift()
             }else{
-                this.netData.rows.push({ '时间': timeString, '收到数据': (responseNetData.bytes_recv/1024/1024/1024)})
+                this.netData.rows.push({ '时间': timeString, '收到数据': (responseNetData.bytes_recv/1024/1024)})
+            }
+        },
+        selectMenuHandler(key, keypath){
+            if (key == 1) {
+                this.dashBoardShow = true
+            }else {
+                this.dashBoardShow = false
             }
         }
     },

@@ -21,7 +21,7 @@
             </div>
             <div class="index-main">
                 <div class="index-left">
-                    <el-menu default-active="1" class="index-left-menu">
+                    <el-menu default-active="1" class="index-left-menu"  @select="selectMenuHandler">
                         <el-menu-item index="1">
                             <i class="el-icon-view"></i>
                             <span slot="title">DashBoard</span>
@@ -41,30 +41,32 @@
                     </el-menu>
                 </div>
                 <div class="index-right">
-                    <el-card class="one-card dash-board-cpu-use">
-                        <div class="card-title">
-                            <span>磁盘使用情况</span>
-                        </div>
-                        <ve-pie :data="diskData" :settings="diskChartSettings"></ve-pie>
-                    </el-card>
-                    <el-card class="one-card dash-board-ram-use">
-                        <div class="card-title">
-                            <span>内存使用情况</span>
-                        </div>
-                        <ve-pie :data="ramData" :settings="ramChartSettings"></ve-pie>
-                    </el-card>
-                    <el-card class="one-card dash-board-storage-use">
-                        <div class="card-title">
-                            <span>CPU使用情况</span>
-                        </div>
-                        <ve-line :data="cpuData" :settings="cpuLineSettings"></ve-line>
-                    </el-card>
-                    <el-card class="one-card dash-board-net-use">
-                        <div class="card-title">
-                            <span>网络使用情况</span>
-                        </div>
-                        <ve-line :data="netData" :settings="netLineSettings"></ve-line>
-                    </el-card>
+                    <div class="dashboard" v-if="dashBoardShow">
+                        <el-card class="one-card dash-board-cpu-use">
+                            <div class="card-title">
+                                <span>磁盘使用情况</span>
+                            </div>
+                            <ve-pie :data="diskData" :settings="diskChartSettings"></ve-pie>
+                        </el-card>
+                        <el-card class="one-card dash-board-ram-use">
+                            <div class="card-title">
+                                <span>内存使用情况</span>
+                            </div>
+                            <ve-pie :data="ramData" :settings="ramChartSettings"></ve-pie>
+                        </el-card>
+                        <el-card class="one-card dash-board-storage-use">
+                            <div class="card-title">
+                                <span>CPU使用情况</span>
+                            </div>
+                            <ve-line :data="cpuData" :settings="cpuLineSettings"></ve-line>
+                        </el-card>
+                        <el-card class="one-card dash-board-net-use">
+                            <div class="card-title">
+                                <span>网络使用情况</span>
+                            </div>
+                            <ve-line :data="netData" :settings="netLineSettings"></ve-line>
+                        </el-card>
+                    </div>
                 </div>
             </div>
         </div>
