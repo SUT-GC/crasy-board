@@ -14,3 +14,10 @@ var getCookie = function(doc, key) {
     }  
     return "";  
 }
+
+var getNowTimeString = function() {
+    let date = new Date()
+    let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+
+    return timeString
+}

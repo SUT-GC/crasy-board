@@ -2,6 +2,7 @@ var app = new Vue({
     el: "#index",
     data: {
         refreshMT: 5000,
+        maxLinePoint: 10,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -60,12 +61,27 @@ var app = new Vue({
         cpuBoardShow: false,
         cpuBoardData: {
             cpuPercentData: {
-                columns: [],
+                columns: ['时间', '使用率'],
                 rows: [
                 ]
             },
             cpuPrecentSetting: {
-
+                area: true,
+                yAxisType: ['percent'],
+            },
+            cpuFreqData :{
+                columns: ['时间', '当前频率', '最小频率', '最大频率'],
+                rows: [
+                    
+                ]
+            },
+            cpuFreqSetting: {
+                yAxisName: ['MHZ'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
             }
         }
     },
@@ -131,19 +147,17 @@ var app = new Vue({
             });
         },
         calculateCpuData(responseCpuData){
-            let date = new Date()
-            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+            let timeString = getNowTimeString()
             if(this.cpuData.rows.length <= 0){
                 this.cpuData.rows.push({ '时间': timeString, '使用率': 0.0})
-            }else if(this.cpuData.rows.length > 10){
+            }else if(this.cpuData.rows.length > this.maxLinePoint){
                 this.cpuData.rows.shift()
             }else{
                 this.cpuData.rows.push({ '时间': timeString, '使用率': (responseCpuData.cpu_usage/100)})
             }
         },
         calculateNetData(responseNetData){
-            let date = new Date()
-            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+            let timeString = getNowTimeString()
             if(this.netData.rows.length <= 0){
                 this.netData.rows.push({ '时间': timeString, '收到数据': 0.0})
             }else if(this.netData.rows.length > 10){
@@ -164,30 +178,30 @@ var app = new Vue({
             }
 
             this.$http.get("/data/cpudashboard/").then(function(response){
+                let timeString = getNowTimeString()
+
                 let responseData = response.body.data
                 let responseCpuData = responseData.cpu_data
 
-                this.fillCpuPercentData(responseCpuData.eve_cpu_persent)
+                this.fillCpuPercentData(timeString, responseCpuData.total_cpu_persent)
+                this.fillCpuFreqData(timeString, responseCpuData.total_cpu_freq)
 
             }, function(response){
                 console.log('服务异常', response)
             });
         },
-        fillCpuPercentData(eveCpuPercent){
-            console.log(eveCpuPercent)
-            if (this.cpuBoardData.columns.length == 0){
-                this.cpuBoardData.columns.push('时间')
-                for(let i = 0; i < eveCpuPercent.length; i++){
-                    this.cpuBoardData.columns.push('CPU-'+ (i+1))
-                }
+        fillCpuPercentData(timeString, totalCpuPersent){
+            if(this.cpuBoardData.cpuPercentData.rows.length > this.maxLinePoint){
+                this.cpuBoardData.cpuPercentData.rows.shift()
+            }else{
+                this.cpuBoardData.cpuPercentData.rows.push({ '时间': timeString, '使用率': (totalCpuPersent/100)})
             }
-
-            let date = new Date()
-            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
-            let oneRecord = {'时间': timeString}
-
-            for(let i = 0; i < eveCpuPercent.length; i++){
-                this.cpuBoardData.columns.push('CPU-'+ (i+1))
+        },
+        fillCpuFreqData(timeString, totalCpuFreq){
+            if(this.cpuBoardData.cpuFreqData.rows.length > this.maxLinePoint){
+                this.cpuBoardData.cpuFreqData.rows.shift()
+            }else{
+                this.cpuBoardData.cpuFreqData.rows.push({ '时间': timeString, '当前频率': totalCpuFreq.current, '最小频率': totalCpuFreq.min, '最大频率': totalCpuFreq.max})
             }
         },
         selectMenuHandler(key, keypath){

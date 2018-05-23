@@ -46,7 +46,7 @@
     border-right: none;
 }
 
-.dashboard{
+.dashboard, .cpuboard{
     flex: auto;
     display: flex;
     flex-wrap: wrap;
@@ -66,10 +66,5 @@
     margin-bottom: 20px;
 }
 
-
-.cpu-board-use-percent {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    margin-left: 20px;
+.cpu-board-use-percent{
 }
