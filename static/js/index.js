@@ -2,6 +2,7 @@ var app = new Vue({
     el: "#index",
     data: {
         refreshMT: 5000,
+        maxLinePoint: 10,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -36,7 +37,7 @@ var app = new Vue({
         },
         cpuLineSettings:{
             area: true,
-            yAxisType: ['percent']
+            yAxisType: ['percent'],
         },
         lastCpuIdle: 0,
         lastCpuAll: 0,
@@ -48,11 +49,54 @@ var app = new Vue({
         },
         netLineSettings:{
             area: true,
-            yAxisName: ['MB']
+            yAxisName: ['MB'],
+            label: {
+                normal: {
+                    show: true
+                }
+            }
         },
-        dashBoardShow: true
+        dashBoardShow: true,
         // 以上变量跟DashBoard里面的展示有关
-
+        cpuBoardShow: false,
+        cpuBoardData: {
+            cpuPercentData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                ]
+            },
+            cpuPrecentSetting: {
+                area: true,
+                yAxisType: ['percent'],
+            },
+            cpuFreqData :{
+                columns: ['时间', '当前频率', '最小频率', '最大频率'],
+                rows: [
+                    
+                ]
+            },
+            cpuFreqSetting: {
+                yAxisName: ['MHZ'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            },
+            cpuTimesData: {
+                columns: ['时间', 'System', 'User', 'Idle'],
+                rows: [
+                    
+                ]
+            },
+            cpuTimesSetting: {
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            }
+        }
     },
     computed: {
         
@@ -116,31 +160,77 @@ var app = new Vue({
             });
         },
         calculateCpuData(responseCpuData){
-            let date = new Date()
-            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+            let timeString = getNowTimeString()
             if(this.cpuData.rows.length <= 0){
                 this.cpuData.rows.push({ '时间': timeString, '使用率': 0.0})
-            }else if(this.cpuData.rows.length > 10){
+            }else if(this.cpuData.rows.length > this.maxLinePoint){
                 this.cpuData.rows.shift()
             }else{
                 this.cpuData.rows.push({ '时间': timeString, '使用率': (responseCpuData.cpu_usage/100)})
             }
         },
         calculateNetData(responseNetData){
-            let date = new Date()
-            let timeString = "" + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ""
+            let timeString = getNowTimeString()
             if(this.netData.rows.length <= 0){
                 this.netData.rows.push({ '时间': timeString, '收到数据': 0.0})
             }else if(this.netData.rows.length > 10){
                 this.netData.rows.shift()
             }else{
-                this.netData.rows.push({ '时间': timeString, '收到数据': (responseNetData.bytes_recv/1024/1024)})
+                this.netData.rows.push({ '时间': timeString, '收到数据': parseInt(responseNetData.bytes_recv/1024/1024, 10)})
             }
+        },
+        fillCpuBoardInfo(){
+            let getCpuBoardAllData = this.getCpuBoardData
+            setInterval(function(){
+                getCpuBoardAllData()
+            }, this.refreshMT)
+        },
+        getCpuBoardData(){
+            if (!this.cpuBoardShow) {
+                return
+            }
+
+            this.$http.get("/data/cpudashboard/").then(function(response){
+                let timeString = getNowTimeString()
+
+                let responseData = response.body.data
+                let responseCpuData = responseData.cpu_data
+
+                this.fillCpuPercentData(timeString, responseCpuData.total_cpu_persent)
+                this.fillCpuFreqData(timeString, responseCpuData.total_cpu_freq)
+                this.fillCpuTimesData(timeString, responseCpuData.total_cpu_times)
+
+            }, function(response){
+                console.log('服务异常', response)
+            });
+        },
+        fillCpuPercentData(timeString, totalCpuPersent){
+            if(this.cpuBoardData.cpuPercentData.rows.length > this.maxLinePoint){
+                this.cpuBoardData.cpuPercentData.rows.shift()
+            }
+            
+            this.cpuBoardData.cpuPercentData.rows.push({ '时间': timeString, '使用率': (totalCpuPersent/100)})
+        },
+        fillCpuFreqData(timeString, totalCpuFreq){
+            if(this.cpuBoardData.cpuFreqData.rows.length > this.maxLinePoint){
+                this.cpuBoardData.cpuFreqData.rows.shift()
+            }
+            
+            this.cpuBoardData.cpuFreqData.rows.push({ '时间': timeString, '当前频率': totalCpuFreq.current, '最小频率': totalCpuFreq.min, '最大频率': totalCpuFreq.max})
+        },
+        fillCpuTimesData(timeString, totalCpuTimes){
+            if(this.cpuBoardData.cpuTimesData.rows.length > this.maxLinePoint){
+                this.cpuBoardData.cpuTimesData.rows.shift()
+            }
+            
+            this.cpuBoardData.cpuTimesData.rows.push({ '时间': timeString, 'System': totalCpuTimes.system_times, 'User': totalCpuTimes.user_times, 'Idle': totalCpuTimes.idle_times})
         },
         selectMenuHandler(key, keypath){
             if (key == 1) {
                 this.dashBoardShow = true
-            }else {
+                this.cpuBoardShow = false
+            }else if(key == 2) {
+                this.cpuBoardShow = true
                 this.dashBoardShow = false
             }
         }
@@ -148,3 +238,4 @@ var app = new Vue({
 })
 
 app.countDashboardCpuTime()
+app.fillCpuBoardInfo()

@@ -24,19 +24,23 @@
                     <el-menu default-active="1" class="index-left-menu"  @select="selectMenuHandler">
                         <el-menu-item index="1">
                             <i class="el-icon-view"></i>
-                            <span slot="title">DashBoard</span>
+                            <span slot="title">大屏</span>
                         </el-menu-item>
                         <el-menu-item index="2">
-                            <i class="el-icon-menu"></i>
-                            <span slot="title">导航二</span>
+                            <i class="el-icon-tickets"></i>
+                            <span slot="title">CPU</span>
                         </el-menu-item>
-                        <el-menu-item index="3" disabled>
-                            <i class="el-icon-document"></i>
-                            <span slot="title">导航三</span>
+                        <el-menu-item index="3">
+                            <i class="el-icon-tickets"></i>
+                            <span slot="title">内存</span>
                         </el-menu-item>
                         <el-menu-item index="4">
-                            <i class="el-icon-setting"></i>
-                            <span slot="title">导航四</span>
+                            <i class="el-icon-tickets"></i>
+                            <span slot="title">磁盘</span>
+                        </el-menu-item>
+                        <el-menu-item index="5">
+                            <i class="el-icon-tickets"></i>
+                            <span slot="title">网络</span>
                         </el-menu-item>
                     </el-menu>
                 </div>
@@ -65,6 +69,26 @@
                                 <span>网络使用情况</span>
                             </div>
                             <ve-line :data="netData" :settings="netLineSettings"></ve-line>
+                        </el-card>
+                    </div>
+                    <div class="cpuboard" v-if="cpuBoardShow">
+                        <el-card class="one-card cpu-board-use-percent">
+                            <div class="card-title">
+                                <span>CPU 使用率</span>
+                            </div>
+                            <ve-line :data="cpuBoardData.cpuPercentData" :settings="cpuBoardData.cpuPrecentSetting"></ve-line>
+                        </el-card>
+                        <el-card class="one-card cpu-board-freq">
+                            <div class="card-title">
+                                <span>CPU 频率</span>
+                            </div>
+                            <ve-line :data="cpuBoardData.cpuFreqData" :settings="cpuBoardData.cpuFreqSetting"></ve-line>
+                        </el-card>
+                        <el-card class="one-card cpu-board-freq">
+                            <div class="card-title">
+                                <span>CPU 时间</span>
+                            </div>
+                            <ve-line :data="cpuBoardData.cpuTimesData" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
                         </el-card>
                     </div>
                 </div>

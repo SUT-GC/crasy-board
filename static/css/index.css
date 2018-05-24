@@ -38,7 +38,7 @@
 }
 
 .index-left{
-    flex: 200px 0 0;
+    flex: 15% 0 0;
     border-right: solid 1px #e6e6e6;
 }
 
@@ -46,7 +46,7 @@
     border-right: none;
 }
 
-.index-right{
+.dashboard, .cpuboard{
     flex: auto;
     display: flex;
     flex-wrap: wrap;
@@ -64,4 +64,7 @@
     width: 100%;
     text-align: center;
     margin-bottom: 20px;
+}
+
+.cpu-board-use-percent{
 }
