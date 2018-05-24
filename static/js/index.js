@@ -82,6 +82,19 @@ var app = new Vue({
                         show: true
                     }
                 }
+            },
+            cpuTimesData: {
+                columns: ['时间', 'System', 'User', 'Idle'],
+                rows: [
+                    
+                ]
+            },
+            cpuTimesSetting: {
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
             }
         }
     },
@@ -185,6 +198,7 @@ var app = new Vue({
 
                 this.fillCpuPercentData(timeString, responseCpuData.total_cpu_persent)
                 this.fillCpuFreqData(timeString, responseCpuData.total_cpu_freq)
+                this.fillCpuTimesData(timeString, responseCpuData.total_cpu_times)
 
             }, function(response){
                 console.log('服务异常', response)
@@ -193,23 +207,29 @@ var app = new Vue({
         fillCpuPercentData(timeString, totalCpuPersent){
             if(this.cpuBoardData.cpuPercentData.rows.length > this.maxLinePoint){
                 this.cpuBoardData.cpuPercentData.rows.shift()
-            }else{
-                this.cpuBoardData.cpuPercentData.rows.push({ '时间': timeString, '使用率': (totalCpuPersent/100)})
             }
+            
+            this.cpuBoardData.cpuPercentData.rows.push({ '时间': timeString, '使用率': (totalCpuPersent/100)})
         },
         fillCpuFreqData(timeString, totalCpuFreq){
             if(this.cpuBoardData.cpuFreqData.rows.length > this.maxLinePoint){
                 this.cpuBoardData.cpuFreqData.rows.shift()
-            }else{
-                this.cpuBoardData.cpuFreqData.rows.push({ '时间': timeString, '当前频率': totalCpuFreq.current, '最小频率': totalCpuFreq.min, '最大频率': totalCpuFreq.max})
             }
+            
+            this.cpuBoardData.cpuFreqData.rows.push({ '时间': timeString, '当前频率': totalCpuFreq.current, '最小频率': totalCpuFreq.min, '最大频率': totalCpuFreq.max})
+        },
+        fillCpuTimesData(timeString, totalCpuTimes){
+            if(this.cpuBoardData.cpuTimesData.rows.length > this.maxLinePoint){
+                this.cpuBoardData.cpuTimesData.rows.shift()
+            }
+            
+            this.cpuBoardData.cpuTimesData.rows.push({ '时间': timeString, 'System': totalCpuTimes.system_times, 'User': totalCpuTimes.user_times, 'Idle': totalCpuTimes.idle_times})
         },
         selectMenuHandler(key, keypath){
             if (key == 1) {
                 this.dashBoardShow = true
                 this.cpuBoardShow = false
             }else if(key == 2) {
-                this.fillCpuBoardInfo()
                 this.cpuBoardShow = true
                 this.dashBoardShow = false
             }
@@ -218,3 +238,4 @@ var app = new Vue({
 })
 
 app.countDashboardCpuTime()
+app.fillCpuBoardInfo()
