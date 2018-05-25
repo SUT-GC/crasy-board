@@ -75,18 +75,30 @@
                         <el-card class="one-card cpu-board-use-percent">
                             <div class="card-title">
                                 <span>CPU 使用率</span>
+                                <span class="detail-info-buttons">
+                                    <el-button type="text" size="mini" round>放大</el-button>
+                                    <el-button type="text" size="mini" round>详细</el-button>
+                                </span>
                             </div>
                             <ve-line :data="cpuBoardData.cpuPercentData" :settings="cpuBoardData.cpuPrecentSetting"></ve-line>
                         </el-card>
                         <el-card class="one-card cpu-board-freq">
                             <div class="card-title">
                                 <span>CPU 频率</span>
+                                <span class="detail-info-buttons">
+                                    <el-button type="text" size="mini" round>放大</el-button>
+                                    <el-button type="text" size="mini" round>详细</el-button>
+                                </span>
                             </div>
                             <ve-line :data="cpuBoardData.cpuFreqData" :settings="cpuBoardData.cpuFreqSetting"></ve-line>
                         </el-card>
                         <el-card class="one-card cpu-board-freq">
                             <div class="card-title">
-                                <span>CPU 时间</span>
+                                <span>CPU 时间</span> 
+                                <span class="detail-info-buttons">
+                                    <el-button type="text" size="mini" round>放大</el-button>
+                                    <el-button type="text" size="mini" round>详细</el-button>
+                                </span>
                             </div>
                             <ve-line :data="cpuBoardData.cpuTimesData" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
                         </el-card>
