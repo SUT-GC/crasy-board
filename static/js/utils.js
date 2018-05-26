@@ -21,3 +21,7 @@ var getNowTimeString = function() {
 
     return timeString
 }
+
+var sliceArrayLeftEndPoints = function(arr, leftLength) {
+    return arr.slice(-leftLength)
+}

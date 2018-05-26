@@ -76,8 +76,11 @@
                             <div class="card-title">
                                 <span>CPU 使用率</span>
                                 <span class="detail-info-buttons">
-                                    <el-button type="text" size="mini" round>放大</el-button>
+                                    <el-button type="text" size="mini"  @click="showBigCpuPersent"  round>放大</el-button>
                                     <el-button type="text" size="mini" round>详细</el-button>
+                                    <el-dialog title="CPU 使用率" :visible.sync="bigShowCpuPercent" class="big-board" width="90%" :before-close="closeBigCpuPersent">
+                                        <ve-line :data="cpuBoardData.cpuPercentData" :settings="cpuBoardData.cpuPrecentSetting"></ve-line>
+                                    </el-dialog>
                                 </span>
                             </div>
                             <ve-line :data="cpuBoardData.cpuPercentData" :settings="cpuBoardData.cpuPrecentSetting"></ve-line>
@@ -86,8 +89,14 @@
                             <div class="card-title">
                                 <span>CPU 频率</span>
                                 <span class="detail-info-buttons">
-                                    <el-button type="text" size="mini" round>放大</el-button>
+                                    <el-button type="text" size="mini" @click="showBigCpuFreq" round>放大</el-button>
                                     <el-button type="text" size="mini" round>详细</el-button>
+                                    <el-dialog title="CPU 频率" :visible.sync="bigShowCpuFreq" class="big-board" width="90%" :before-close="closeBigCpuFreq">
+                                        <ve-line :data="cpuBoardData.cpuFreqData" :settings="cpuBoardData.cpuFreqSetting"></ve-line>
+                                    </el-dialog>
+                                    <!-- <el-dialog title="CPU 频率详情" :visible.sync="detailShowCpuFreq" class="big-board" width="90%" :before-close="closeBigCpuFreq">
+                                        
+                                    </el-dialog> -->
                                 </span>
                             </div>
                             <ve-line :data="cpuBoardData.cpuFreqData" :settings="cpuBoardData.cpuFreqSetting"></ve-line>
@@ -96,8 +105,11 @@
                             <div class="card-title">
                                 <span>CPU 时间</span> 
                                 <span class="detail-info-buttons">
-                                    <el-button type="text" size="mini" round>放大</el-button>
+                                    <el-button type="text" size="mini" @click="showBigCpuTime" round>放大</el-button>
                                     <el-button type="text" size="mini" round>详细</el-button>
+                                    <el-dialog title="CPU 时间" :visible.sync="bigShowCpuTime" class="big-board" width="90%" :before-close="closeBigCpuTime">
+                                        <ve-line :data="cpuBoardData.cpuTimesData" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
+                                    </el-dialog>
                                 </span>
                             </div>
                             <ve-line :data="cpuBoardData.cpuTimesData" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
