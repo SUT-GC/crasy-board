@@ -2,7 +2,12 @@ var app = new Vue({
     el: "#index",
     data: {
         refreshMT: 5000,
-        maxLinePoint: 10,
+        defaultLonePoint: 10,
+        maxMultiple: 3,
+        minMultiple: 1,
+        cpuFreqEnlargeMultiple: 1,
+        cpuTimeEnlargeMultiple: 1,
+        cpuPercentEnlargeMultiple: 1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -95,11 +100,27 @@ var app = new Vue({
                         show: true
                     }
                 }
-            }
-        }
+            },
+            eveCpuFreqData: [
+                
+            ],
+        },
+        bigShowCpuFreq: false,
+        bigShowCpuPercent: false,
+        bigShowCpuTime: false,
+        detailShowCpuFreq: false
+        // 以上为CPU board 页面
     },
     computed: {
-        
+        cpuFreqMaxLinePoint(){
+            return this.defaultLonePoint * this.cpuFreqEnlargeMultiple
+        },
+        cpuTimeMaxLinePoint(){
+            return this.defaultLonePoint * this.cpuTimeEnlargeMultiple
+        },
+        cpuPersentMaxLinePoint(){
+            return this.defaultLonePoint * this.cpuPercentEnlargeMultiple
+        }
     },
     methods: {
         handleOpen(key, keyPath) {
@@ -163,7 +184,7 @@ var app = new Vue({
             let timeString = getNowTimeString()
             if(this.cpuData.rows.length <= 0){
                 this.cpuData.rows.push({ '时间': timeString, '使用率': 0.0})
-            }else if(this.cpuData.rows.length > this.maxLinePoint){
+            }else if(this.cpuData.rows.length > this.defaultLonePoint){
                 this.cpuData.rows.shift()
             }else{
                 this.cpuData.rows.push({ '时间': timeString, '使用率': (responseCpuData.cpu_usage/100)})
@@ -199,31 +220,40 @@ var app = new Vue({
                 this.fillCpuPercentData(timeString, responseCpuData.total_cpu_persent)
                 this.fillCpuFreqData(timeString, responseCpuData.total_cpu_freq)
                 this.fillCpuTimesData(timeString, responseCpuData.total_cpu_times)
+                this.fillEveCpuFreqData(timeString, responseCpuData.eve_cpu_freq)
 
             }, function(response){
                 console.log('服务异常', response)
             });
         },
         fillCpuPercentData(timeString, totalCpuPersent){
-            if(this.cpuBoardData.cpuPercentData.rows.length > this.maxLinePoint){
-                this.cpuBoardData.cpuPercentData.rows.shift()
-            }
-            
             this.cpuBoardData.cpuPercentData.rows.push({ '时间': timeString, '使用率': (totalCpuPersent/100)})
+
+            this.cpuBoardData.cpuPercentData.rows = sliceArrayLeftEndPoints(this.cpuBoardData.cpuPercentData.rows, this.cpuPersentMaxLinePoint)
         },
         fillCpuFreqData(timeString, totalCpuFreq){
-            if(this.cpuBoardData.cpuFreqData.rows.length > this.maxLinePoint){
-                this.cpuBoardData.cpuFreqData.rows.shift()
-            }
-            
             this.cpuBoardData.cpuFreqData.rows.push({ '时间': timeString, '当前频率': totalCpuFreq.current, '最小频率': totalCpuFreq.min, '最大频率': totalCpuFreq.max})
+            
+            this.cpuBoardData.cpuFreqData.rows = sliceArrayLeftEndPoints(this.cpuBoardData.cpuFreqData.rows, this.cpuFreqMaxLinePoint)
         },
         fillCpuTimesData(timeString, totalCpuTimes){
-            if(this.cpuBoardData.cpuTimesData.rows.length > this.maxLinePoint){
-                this.cpuBoardData.cpuTimesData.rows.shift()
-            }
-            
             this.cpuBoardData.cpuTimesData.rows.push({ '时间': timeString, 'System': totalCpuTimes.system_times, 'User': totalCpuTimes.user_times, 'Idle': totalCpuTimes.idle_times})
+
+            this.cpuBoardData.cpuTimesData.rows = sliceArrayLeftEndPoints(this.cpuBoardData.cpuTimesData.rows, this.cpuTimeMaxLinePoint)
+        },
+        fillEveCpuFreqData(timeString, eveCpuData){
+            for(let index = 0; index < eveCpuData.length; index++){
+                let cpuData = eveCpuData[index]
+                if(this.cpuBoardData.eveCpuFreqData.length < index + 1){
+                    this.cpuBoardData.eveCpuFreqData.push({'columns': ['时间', '当前频率', '最小频率', '最大频率'],'rows':[{'时间':timeString, '当前频率': cpuData.current, '最小频率': cpuData.min, '最大频率': cpuData.max }]})
+                }else{
+                    this.cpuBoardData.eveCpuFreqData[index].rows.push({'时间':timeString, '当前频率': cpuData.current, '最小频率': cpuData.min, '最大频率': cpuData.max })
+                }
+            }
+
+            for(let index = 0; index < this.cpuBoardData.eveCpuFreqData.length; index++){
+                this.cpuBoardData.eveCpuFreqData[index].rows = sliceArrayLeftEndPoints(this.cpuBoardData.eveCpuFreqData[index].rows, this.cpuFreqMaxLinePoint)
+            }
         },
         selectMenuHandler(key, keypath){
             if (key == 1) {
@@ -233,6 +263,38 @@ var app = new Vue({
                 this.cpuBoardShow = true
                 this.dashBoardShow = false
             }
+        },
+        showBigCpuFreq() {
+            this.bigShowCpuFreq = true
+            this.cpuFreqEnlargeMultiple = this.maxMultiple
+        },
+        showBigCpuPersent() {
+            this.bigShowCpuPercent = true
+            this.cpuPercentEnlargeMultiple = this.maxMultiple
+        },
+        showBigCpuTime() {
+            this.bigShowCpuTime = true
+            this.cpuTimeEnlargeMultiple = this.maxMultiple
+        },
+        showDetailCpuFreq() {
+            this.detailShowCpuFreq = true
+            this.cpuFreqEnlargeMultiple = this.maxMultiple
+        },
+        closeBigCpuFreq() {
+            this.bigShowCpuFreq = false
+            this.cpuFreqEnlargeMultiple = this.minMultiple
+        },
+        closeDetailCpuFreq() {
+            this.detailShowCpuFreq = false
+            this.cpuFreqEnlargeMultiple = this.minMultiple
+        },
+        closeBigCpuPersent() {
+            this.bigShowCpuPercent = false
+            this.cpuPercentEnlargeMultiple = this.minMultiple
+        },
+        closeBigCpuTime(){
+            this.bigShowCpuTime = false
+            this.cpuTimeEnlargeMultiple = this.minMultiple
         }
     },
 })
