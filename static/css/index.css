@@ -75,3 +75,7 @@
 .detail-info-buttons .el-button{
     padding:  0px;
 }
+
+.detail-line{
+    width: 40%;
+}

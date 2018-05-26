@@ -90,13 +90,16 @@
                                 <span>CPU 频率</span>
                                 <span class="detail-info-buttons">
                                     <el-button type="text" size="mini" @click="showBigCpuFreq" round>放大</el-button>
-                                    <el-button type="text" size="mini" round>详细</el-button>
+                                    <el-button type="text" size="mini" @click="showDetailCpuFreq" round>详细</el-button>
                                     <el-dialog title="CPU 频率" :visible.sync="bigShowCpuFreq" class="big-board" width="90%" :before-close="closeBigCpuFreq">
                                         <ve-line :data="cpuBoardData.cpuFreqData" :settings="cpuBoardData.cpuFreqSetting"></ve-line>
                                     </el-dialog>
-                                    <!-- <el-dialog title="CPU 频率详情" :visible.sync="detailShowCpuFreq" class="big-board" width="90%" :before-close="closeBigCpuFreq">
-                                        
-                                    </el-dialog> -->
+                                    <el-dialog title="CPU 频率详情" :visible.sync="detailShowCpuFreq" class="big-board" width="90%" :before-close="closeDetailCpuFreq">
+                                        <div class="cpu-freq-detail" v-for="(item, index) in cpuBoardData.eveCpuFreqData">
+                                            <h2>第 {{index+1}} CPU</h2>
+                                            <ve-line :data="cpuBoardData.eveCpuFreqData[index]" :settings="cpuBoardData.cpuFreqSetting"></ve-line>
+                                        </div>
+                                    </el-dialog>
                                 </span>
                             </div>
                             <ve-line :data="cpuBoardData.cpuFreqData" :settings="cpuBoardData.cpuFreqSetting"></ve-line>
