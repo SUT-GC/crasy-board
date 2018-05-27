@@ -104,11 +104,24 @@ var app = new Vue({
             eveCpuFreqData: [
                 
             ],
+            eveCpuTimesData: [
+
+            ],
+            eveCpuPercentData: {
+                columns: [],
+                rows: [
+                ]
+            },
+            eveCpuPercentSetting: {
+                yAxisType: ['percent']
+            }
         },
         bigShowCpuFreq: false,
         bigShowCpuPercent: false,
         bigShowCpuTime: false,
-        detailShowCpuFreq: false
+        detailShowCpuFreq: false,
+        detailShowCpuTimes: false,
+        detailShowCpuPercent: false
         // 以上为CPU board 页面
     },
     computed: {
@@ -221,6 +234,8 @@ var app = new Vue({
                 this.fillCpuFreqData(timeString, responseCpuData.total_cpu_freq)
                 this.fillCpuTimesData(timeString, responseCpuData.total_cpu_times)
                 this.fillEveCpuFreqData(timeString, responseCpuData.eve_cpu_freq)
+                this.fillEveCpuTimesData(timeString, responseCpuData.eve_cpu_times)
+                this.fillEveCpuPercentData(timeString, responseCpuData.eve_cpu_persent)
 
             }, function(response){
                 console.log('服务异常', response)
@@ -254,6 +269,39 @@ var app = new Vue({
             for(let index = 0; index < this.cpuBoardData.eveCpuFreqData.length; index++){
                 this.cpuBoardData.eveCpuFreqData[index].rows = sliceArrayLeftEndPoints(this.cpuBoardData.eveCpuFreqData[index].rows, this.cpuFreqMaxLinePoint)
             }
+
+        },
+        fillEveCpuTimesData(timeString, eveCpuData){
+            for(let index = 0; index < eveCpuData.length; index++) {
+                let cpuData = eveCpuData[index]
+                if(this.cpuBoardData.eveCpuTimesData.length < index + 1){
+                    this.cpuBoardData.eveCpuTimesData.push({'columns': ['时间', 'System', 'User', 'Idle'], 'rows': [{'时间': timeString, 'System': cpuData.system_times, 'User': cpuData.user_times, 'Idle': cpuData.idle_times}]})
+                } else {
+                    this.cpuBoardData.eveCpuTimesData[index].rows.push({'时间': timeString, 'System': cpuData.system_times, 'User': cpuData.user_times, 'Idle': cpuData.idle_times})
+                }
+            }
+
+            for(let index = 0; index < this.cpuBoardData.eveCpuTimesData.length; index++) {
+                this.cpuBoardData.eveCpuTimesData[index].rows = sliceArrayLeftEndPoints(this.cpuBoardData.eveCpuTimesData[index].rows, this.cpuTimeMaxLinePoint)
+            }
+        },
+        fillEveCpuPercentData(timeString, eveCpuData) {
+            let columns = ['时间']
+            let row = {'时间': timeString}
+            for(let index = 0; index < eveCpuData.length; index++) {
+                let column_name = '第' + (index + 1) + 'CPU'
+                columns.push(column_name)
+                row[column_name] = eveCpuData[index].cpu_percent / 100
+            }
+
+            if(this.cpuBoardData.eveCpuPercentData.columns.length <= 0) {
+                this.cpuBoardData.eveCpuPercentData.columns = columns
+                this.cpuBoardData.eveCpuPercentData.rows.push(row)
+            } else {
+                this.cpuBoardData.eveCpuPercentData.rows.push(row)
+            }
+
+            this.cpuBoardData.eveCpuPercentData.rows = sliceArrayLeftEndPoints(this.cpuBoardData.eveCpuPercentData.rows, this.cpuPersentMaxLinePoint)
         },
         selectMenuHandler(key, keypath){
             if (key == 1) {
@@ -280,6 +328,14 @@ var app = new Vue({
             this.detailShowCpuFreq = true
             this.cpuFreqEnlargeMultiple = this.maxMultiple
         },
+        showDetailCpuTimes() {
+            this.detailShowCpuTimes = true
+            this.cpuTimeEnlargeMultiple = this.maxMultiple
+        },
+        showDetailCpuPercent() {
+            this.detailShowCpuPercent = true
+            this.cpuPercentEnlargeMultiple = this.maxMultiple
+        },
         closeBigCpuFreq() {
             this.bigShowCpuFreq = false
             this.cpuFreqEnlargeMultiple = this.minMultiple
@@ -295,7 +351,16 @@ var app = new Vue({
         closeBigCpuTime(){
             this.bigShowCpuTime = false
             this.cpuTimeEnlargeMultiple = this.minMultiple
+        },
+        closeDetailCpuTimes(){
+            this.detailShowCpuTimes = false
+            this.cpuTimeEnlargeMultiple = this.minMultiple
+        },
+        closeDetailCpuPercent(){
+            this.detailShowCpuPercent = false
+            this.cpuPercentEnlargeMultiple = this.minMultiple
         }
+
     },
 })
 
