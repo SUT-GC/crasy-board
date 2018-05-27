@@ -109,9 +109,15 @@
                                 <span>CPU 时间</span> 
                                 <span class="detail-info-buttons">
                                     <el-button type="text" size="mini" @click="showBigCpuTime" round>放大</el-button>
-                                    <el-button type="text" size="mini" round>详细</el-button>
+                                    <el-button type="text" size="mini" @click="showDetailCpuTimes" round>详细</el-button>
                                     <el-dialog title="CPU 时间" :visible.sync="bigShowCpuTime" class="big-board" width="90%" :before-close="closeBigCpuTime">
                                         <ve-line :data="cpuBoardData.cpuTimesData" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
+                                    </el-dialog>
+                                    <el-dialog title="CPU 时间详情" :visible.sync="detailShowCpuTimes" class="big-board" width="90%" :before-close="closeDetailCpuTimes">
+                                        <div class="cpu-times-detail" v-for="(item, index) in cpuBoardData.eveCpuTimesData">
+                                            <h2>第 {{index + 1}} CPU</h2>
+                                            <ve-line :data="cpuBoardData.eveCpuTimesData[index]" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
+                                        </div>
                                     </el-dialog>
                                 </span>
                             </div>

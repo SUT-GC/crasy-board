@@ -104,11 +104,15 @@ var app = new Vue({
             eveCpuFreqData: [
                 
             ],
+            eveCpuTimesData: [
+
+            ]
         },
         bigShowCpuFreq: false,
         bigShowCpuPercent: false,
         bigShowCpuTime: false,
-        detailShowCpuFreq: false
+        detailShowCpuFreq: false,
+        detailShowCpuTimes: false
         // 以上为CPU board 页面
     },
     computed: {
@@ -221,6 +225,7 @@ var app = new Vue({
                 this.fillCpuFreqData(timeString, responseCpuData.total_cpu_freq)
                 this.fillCpuTimesData(timeString, responseCpuData.total_cpu_times)
                 this.fillEveCpuFreqData(timeString, responseCpuData.eve_cpu_freq)
+                this.fillEveCpuTimesData(timeString, responseCpuData.eve_cpu_times)
 
             }, function(response){
                 console.log('服务异常', response)
@@ -254,6 +259,21 @@ var app = new Vue({
             for(let index = 0; index < this.cpuBoardData.eveCpuFreqData.length; index++){
                 this.cpuBoardData.eveCpuFreqData[index].rows = sliceArrayLeftEndPoints(this.cpuBoardData.eveCpuFreqData[index].rows, this.cpuFreqMaxLinePoint)
             }
+
+        },
+        fillEveCpuTimesData(timeString, eveCpuData){
+            for(let index = 0; index < eveCpuData.length; index++) {
+                let cpuData = eveCpuData[index]
+                if(this.cpuBoardData.eveCpuTimesData.length < index + 1){
+                    this.cpuBoardData.eveCpuTimesData.push({'columns': ['时间', 'System', 'User', 'Idle'], 'rows': [{'时间': timeString, 'System': cpuData.system_times, 'User': cpuData.user_times, 'Idle': cpuData.idle_times}]})
+                } else {
+                    this.cpuBoardData.eveCpuTimesData[index].rows.push({'时间': timeString, 'System': cpuData.system_times, 'User': cpuData.user_times, 'Idle': cpuData.idle_times})
+                }
+            }
+
+            for(let index = 0; index < this.cpuBoardData.eveCpuTimesData.length; index++) {
+                this.cpuBoardData.eveCpuTimesData[index].rows = sliceArrayLeftEndPoints(this.cpuBoardData.eveCpuTimesData[index].rows, this.cpuTimeMaxLinePoint)
+            }
         },
         selectMenuHandler(key, keypath){
             if (key == 1) {
@@ -280,6 +300,10 @@ var app = new Vue({
             this.detailShowCpuFreq = true
             this.cpuFreqEnlargeMultiple = this.maxMultiple
         },
+        showDetailCpuTimes() {
+            this.detailShowCpuTimes = true
+            this.cpuTimeEnlargeMultiple = this.maxMultiple
+        },
         closeBigCpuFreq() {
             this.bigShowCpuFreq = false
             this.cpuFreqEnlargeMultiple = this.minMultiple
@@ -294,6 +318,10 @@ var app = new Vue({
         },
         closeBigCpuTime(){
             this.bigShowCpuTime = false
+            this.cpuTimeEnlargeMultiple = this.minMultiple
+        },
+        closeDetailCpuTimes(){
+            this.detailShowCpuTimes = false
             this.cpuTimeEnlargeMultiple = this.minMultiple
         }
     },
