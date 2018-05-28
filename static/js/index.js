@@ -121,8 +121,9 @@ var app = new Vue({
         bigShowCpuTime: false,
         detailShowCpuFreq: false,
         detailShowCpuTimes: false,
-        detailShowCpuPercent: false
+        detailShowCpuPercent: false,
         // 以上为CPU board 页面
+        memBoardShow: false
     },
     computed: {
         cpuFreqMaxLinePoint(){
@@ -307,9 +308,15 @@ var app = new Vue({
             if (key == 1) {
                 this.dashBoardShow = true
                 this.cpuBoardShow = false
+                this.memBoardShow = false
             }else if(key == 2) {
                 this.cpuBoardShow = true
                 this.dashBoardShow = false
+                this.memBoardShow = false
+            }else if(key == 3){
+                this.cpuBoardShow = false
+                this.dashBoardShow = false
+                this.memBoardShow = true
             }
         },
         showBigCpuFreq() {
