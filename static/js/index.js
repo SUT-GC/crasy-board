@@ -8,6 +8,7 @@ var app = new Vue({
         cpuFreqEnlargeMultiple: 1,
         cpuTimeEnlargeMultiple: 1,
         cpuPercentEnlargeMultiple: 1,
+        vmPercentEnlargeMultiple: 1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -123,7 +124,19 @@ var app = new Vue({
         detailShowCpuTimes: false,
         detailShowCpuPercent: false,
         // 以上为CPU board 页面
-        memBoardShow: false
+        memBoardShow: false,
+        memBoardData: {
+            vmPercentData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            vmPrecentSetting: {
+                area: true,
+                yAxisType: ['percent']
+            },
+        }
     },
     computed: {
         cpuFreqMaxLinePoint(){
@@ -134,6 +147,9 @@ var app = new Vue({
         },
         cpuPersentMaxLinePoint(){
             return this.defaultLonePoint * this.cpuPercentEnlargeMultiple
+        },
+        vmPercentMaxLinePoint(){
+            return this.defaultLonePoint * this.vmPercentEnlargeMultiple
         }
     },
     methods: {
@@ -214,6 +230,7 @@ var app = new Vue({
                 this.netData.rows.push({ '时间': timeString, '收到数据': parseInt(responseNetData.bytes_recv/1024/1024, 10)})
             }
         },
+        // 上面是 DashBoard 的计算
         fillCpuBoardInfo(){
             let getCpuBoardAllData = this.getCpuBoardData
             setInterval(function(){
@@ -366,10 +383,38 @@ var app = new Vue({
         closeDetailCpuPercent(){
             this.detailShowCpuPercent = false
             this.cpuPercentEnlargeMultiple = this.minMultiple
-        }
+        },
+        // 上面是CPU Board 的计算
+        fillVmBoardInfo(){
+            let getMemBoardAllData = this.getMemBoardData
+            setInterval(function(){
+                getMemBoardAllData()
+            }, this.refreshMT)
+        },
+        getMemBoardData(){
+            if (!this.memBoardShow) {
+                return
+            }
 
-    },
+            this.$http.get("/data/memdashboard/").then(function(response){
+                let timeString = getNowTimeString()
+
+                let responseData = response.body.data
+                let responseMemData = responseData.mem_data
+
+                this.fillVmPercentData(timeString, responseMemData.vmem)
+            }, function(response){
+                console.log('服务异常', response)
+            });
+        },
+        fillVmPercentData(timeString, vmData){
+            this.memBoardData.vmPercentData.rows.push({ '时间': timeString, '使用率': (vmData.percent/100)})
+
+            this.memBoardData.vmPercentData.rows = sliceArrayLeftEndPoints(this.memBoardData.vmPercentData.rows, this.vmPercentMaxLinePoint)
+        }
+    }
 })
 
 app.countDashboardCpuTime()
 app.fillCpuBoardInfo()
+app.fillVmBoardInfo()
