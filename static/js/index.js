@@ -9,6 +9,7 @@ var app = new Vue({
         cpuTimeEnlargeMultiple: 1,
         cpuPercentEnlargeMultiple: 1,
         vmPercentEnlargeMultiple: 1,
+        swapPercentEnlargeMultiple:1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -136,6 +137,16 @@ var app = new Vue({
                 area: true,
                 yAxisType: ['percent']
             },
+            swapPercentData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            swapPrecentSetting: {
+                area: true,
+                yAxisType: ['percent']
+            },
         }
     },
     computed: {
@@ -150,6 +161,9 @@ var app = new Vue({
         },
         vmPercentMaxLinePoint(){
             return this.defaultLonePoint * this.vmPercentEnlargeMultiple
+        },
+        swapPercentMaxLinePoint(){
+            return this.defaultLonePoint * this.swapPercentEnlargeMultiple
         }
     },
     methods: {
@@ -403,6 +417,7 @@ var app = new Vue({
                 let responseMemData = responseData.mem_data
 
                 this.fillVmPercentData(timeString, responseMemData.vmem)
+                this.fillSwapPercentData(timeString, responseMemData.swap)
             }, function(response){
                 console.log('服务异常', response)
             });
@@ -411,6 +426,11 @@ var app = new Vue({
             this.memBoardData.vmPercentData.rows.push({ '时间': timeString, '使用率': (vmData.percent/100)})
 
             this.memBoardData.vmPercentData.rows = sliceArrayLeftEndPoints(this.memBoardData.vmPercentData.rows, this.vmPercentMaxLinePoint)
+        },
+        fillSwapPercentData(timeString, swapData) {
+            this.memBoardData.swapPercentData.rows.push({ '时间': timeString, '使用率': (swapData.percent/100)})
+
+            this.memBoardData.swapPercentData.rows = sliceArrayLeftEndPoints(this.memBoardData.swapPercentData.rows, this.swapPercentMaxLinePoint)
         }
     }
 })
