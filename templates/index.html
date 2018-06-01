@@ -132,13 +132,16 @@
                             <div class="card-title">
                                 <span>内存 使用率</span>
                                 <span class="detail-info-buttons">
-                                    <el-button type="text" size="mini"  @click="showBigCpuPersent"  round>放大</el-button>
-                                    <el-button type="text" size="mini" @click="showDetailCpuPercent" round>详细</el-button>
-                                    <!-- <el-dialog title="CPU 使用率" :visible.sync="bigShowCpuPercent" class="big-board" width="90%" :before-close="closeBigCpuPersent">
-                                        <ve-line :data="cpuBoardData.cpuPercentData" :settings="cpuBoardData.cpuPrecentSetting"></ve-line>
+                                    <el-button type="text" size="mini"  @click="showBigVmPersent"  round>放大</el-button>
+                                    <el-button type="text" size="mini" @click="showDetailVmPercent" round>详细</el-button>
+                                    <el-dialog title="内存 使用率" :visible.sync="bigShowVmPercent" class="big-board" width="90%" :before-close="closeBigVmPercent">
+                                        <ve-line :data="memBoardData.vmPercentData" :settings="memBoardData.vmPrecentSetting"></ve-line>
                                     </el-dialog>
-                                    <el-dialog title="CPU 使用率详情" :visible.sync="detailShowCpuPercent" class="big-boadr" width="90%" :before-close="closeDetailCpuPercent">
-                                        <ve-line :data="cpuBoardData.eveCpuPercentData" :settings="cpuBoardData.eveCpuPercentSetting"></ve-line>
+                                    <!-- <el-dialog title="内存 使用率详情" :visible.sync="detailShowCpuTimes" class="big-board" width="90%" :before-close="closeDetailCpuTimes">
+                                        <div class="cpu-times-detail" v-for="(item, index) in cpuBoardData.eveCpuTimesData">
+                                            <h2>第 {{index + 1}} CPU</h2>
+                                            <ve-line :data="cpuBoardData.eveCpuTimesData[index]" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
+                                        </div>
                                     </el-dialog> -->
                                 </span>
                             </div>
@@ -148,12 +151,12 @@
                             <div class="card-title">
                                 <span>交换空间 使用率</span>
                                 <span class="detail-info-buttons">
-                                    <el-button type="text" size="mini"  @click="showBigCpuPersent"  round>放大</el-button>
+                                    <el-button type="text" size="mini"  @click="showBigSwapPercent"  round>放大</el-button>
                                     <el-button type="text" size="mini" @click="showDetailCpuPercent" round>详细</el-button>
-                                    <!-- <el-dialog title="CPU 使用率" :visible.sync="bigShowCpuPercent" class="big-board" width="90%" :before-close="closeBigCpuPersent">
-                                        <ve-line :data="cpuBoardData.cpuPercentData" :settings="cpuBoardData.cpuPrecentSetting"></ve-line>
+                                    <el-dialog title="交换空间 使用率" :visible.sync="bigShowSwapPercent" class="big-board" width="90%" :before-close="closeBigSwapPercent">
+                                        <ve-line :data="memBoardData.swapPercentData" :settings="memBoardData.swapPrecentSetting"></ve-line>
                                     </el-dialog>
-                                    <el-dialog title="CPU 使用率详情" :visible.sync="detailShowCpuPercent" class="big-boadr" width="90%" :before-close="closeDetailCpuPercent">
+                                    <!-- <el-dialog title="CPU 使用率详情" :visible.sync="detailShowCpuPercent" class="big-boadr" width="90%" :before-close="closeDetailCpuPercent">
                                         <ve-line :data="cpuBoardData.eveCpuPercentData" :settings="cpuBoardData.eveCpuPercentSetting"></ve-line>
                                     </el-dialog> -->
                                 </span>

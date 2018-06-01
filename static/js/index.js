@@ -126,6 +126,8 @@ var app = new Vue({
         detailShowCpuPercent: false,
         // 以上为CPU board 页面
         memBoardShow: false,
+        bigShowVmPercent: false,
+        bigShowSwapPercent: false,
         memBoardData: {
             vmPercentData: {
                 columns: ['时间', '使用率'],
@@ -431,6 +433,25 @@ var app = new Vue({
             this.memBoardData.swapPercentData.rows.push({ '时间': timeString, '使用率': (swapData.percent/100)})
 
             this.memBoardData.swapPercentData.rows = sliceArrayLeftEndPoints(this.memBoardData.swapPercentData.rows, this.swapPercentMaxLinePoint)
+        },
+        showBigVmPersent() {
+            this.bigShowVmPercent = true,
+            this.vmPercentEnlargeMultiple = this.maxMultiple
+        },
+        showBigSwapPercent() {
+            this.bigShowSwapPercent = true,
+            this.swapPercentEnlargeMultiple = this.maxMultiple
+        },
+        closeBigVmPercent() {
+            this.bigShowVmPercent = false,
+            this.vmPercentEnlargeMultiple = this.minMultiple
+        },
+        closeBigSwapPercent() {
+            this.bigShowSwapPercent = false,
+            this.swapPercentEnlargeMultiple = this.minMultiple
+        },
+        showDetailVmPercent(){
+
         }
     }
 })
