@@ -10,6 +10,8 @@ var app = new Vue({
         cpuPercentEnlargeMultiple: 1,
         vmPercentEnlargeMultiple: 1,
         swapPercentEnlargeMultiple:1,
+        vmInfoEnlargeMultiple: 1,
+        swapInfoEnlargeMultiple: 1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -128,6 +130,8 @@ var app = new Vue({
         memBoardShow: false,
         bigShowVmPercent: false,
         bigShowSwapPercent: false,
+        detailShowVmInfo: false,
+        detailShowSwapInfo: false,
         memBoardData: {
             vmPercentData: {
                 columns: ['时间', '使用率'],
@@ -149,6 +153,34 @@ var app = new Vue({
                 area: true,
                 yAxisType: ['percent']
             },
+            vmDetailData: {
+                columns: ['时间', 'total', 'avalible', 'used', 'free'],
+                rows: [
+                    
+                ]
+            },
+            vmDetailSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            },
+            swapDetailData: {
+                columns: ['时间', 'total', 'used', 'free', 'sin', 'sout'],
+                rows: [
+                    
+                ]
+            },
+            swapDetailSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            }
         }
     },
     computed: {
@@ -166,6 +198,12 @@ var app = new Vue({
         },
         swapPercentMaxLinePoint(){
             return this.defaultLonePoint * this.swapPercentEnlargeMultiple
+        },
+        vmInfoMaxLinePoint(){
+            return this.defaultLonePoint * this.vmInfoEnlargeMultiple
+        },
+        swapInfoMaxLinePoint(){
+            return this.defaultLonePoint * this.swapInfoEnlargeMultiple
         }
     },
     methods: {
@@ -420,6 +458,8 @@ var app = new Vue({
 
                 this.fillVmPercentData(timeString, responseMemData.vmem)
                 this.fillSwapPercentData(timeString, responseMemData.swap)
+                this.fillVmDetailData(timeString, responseMemData.vmem)
+                this.fillSwapDetailData(timeString, responseMemData.swap)
             }, function(response){
                 console.log('服务异常', response)
             });
@@ -434,6 +474,16 @@ var app = new Vue({
 
             this.memBoardData.swapPercentData.rows = sliceArrayLeftEndPoints(this.memBoardData.swapPercentData.rows, this.swapPercentMaxLinePoint)
         },
+        fillVmDetailData(timeString, vmData) {
+            this.memBoardData.vmDetailData.rows.push({ '时间': timeString, 'total': vmData.total, 'avalible': vmData.avalible, 'used': vmData.used, 'free': vmData.free})
+
+            this.memBoardData.vmDetailData.rows = sliceArrayLeftEndPoints(this.memBoardData.vmDetailData.rows, this.vmInfoMaxLinePoint)
+        },
+        fillSwapDetailData(timeString, vmData) {
+            this.memBoardData.swapDetailData.rows.push({ '时间': timeString, 'total': vmData.total, 'sin': vmData.sin, 'sout': vmData.sout, 'used': vmData.used, 'free': vmData.free})
+
+            this.memBoardData.swapDetailData.rows = sliceArrayLeftEndPoints(this.memBoardData.swapDetailData.rows, this.swapInfoMaxLinePoint)
+        },
         showBigVmPersent() {
             this.bigShowVmPercent = true,
             this.vmPercentEnlargeMultiple = this.maxMultiple
@@ -441,6 +491,14 @@ var app = new Vue({
         showBigSwapPercent() {
             this.bigShowSwapPercent = true,
             this.swapPercentEnlargeMultiple = this.maxMultiple
+        },
+        showDetailVmInfo(){
+            this.detailShowVmInfo = true,
+            this.vmInfoEnlargeMultiple = this.maxMultiple
+        },
+        showDetailSwapInfo(){
+            this.detailShowSwapInfo = true,
+            this.swapInfoEnlargeMultiple = this.maxMultiple
         },
         closeBigVmPercent() {
             this.bigShowVmPercent = false,
@@ -450,8 +508,13 @@ var app = new Vue({
             this.bigShowSwapPercent = false,
             this.swapPercentEnlargeMultiple = this.minMultiple
         },
-        showDetailVmPercent(){
-
+        closeDetailVmInfo(){
+            this.detailShowVmInfo = false,
+            this.vmInfoEnlargeMultiple = this.maxMultiple
+        },
+        closeDetailSwapInfo(){
+            this.detailShowSwapInfo = false,
+            this.swapInfoEnlargeMultiple = this.minMultiple
         }
     }
 })
