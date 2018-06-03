@@ -181,7 +181,9 @@ var app = new Vue({
                     }
                 }
             }
-        }
+        },
+        // 以上为内存面板的数据
+        diskBoardShow:false,
     },
     computed: {
         cpuFreqMaxLinePoint(){
@@ -380,14 +382,22 @@ var app = new Vue({
                 this.dashBoardShow = true
                 this.cpuBoardShow = false
                 this.memBoardShow = false
+                this.diskBoardShow = false
             }else if(key == 2) {
                 this.cpuBoardShow = true
                 this.dashBoardShow = false
                 this.memBoardShow = false
+                this.diskBoardShow = false
             }else if(key == 3){
                 this.cpuBoardShow = false
                 this.dashBoardShow = false
                 this.memBoardShow = true
+                this.diskBoardShow = false
+            }else if(key == 4) {
+                this.cpuBoardShow = false
+                this.dashBoardShow = false
+                this.memBoardShow = false
+                this.diskBoardShow = true
             }
         },
         showBigCpuFreq() {
