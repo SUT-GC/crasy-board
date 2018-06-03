@@ -8,6 +8,10 @@ var app = new Vue({
         cpuFreqEnlargeMultiple: 1,
         cpuTimeEnlargeMultiple: 1,
         cpuPercentEnlargeMultiple: 1,
+        vmPercentEnlargeMultiple: 1,
+        swapPercentEnlargeMultiple:1,
+        vmInfoEnlargeMultiple: 1,
+        swapInfoEnlargeMultiple: 1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -121,8 +125,63 @@ var app = new Vue({
         bigShowCpuTime: false,
         detailShowCpuFreq: false,
         detailShowCpuTimes: false,
-        detailShowCpuPercent: false
+        detailShowCpuPercent: false,
         // 以上为CPU board 页面
+        memBoardShow: false,
+        bigShowVmPercent: false,
+        bigShowSwapPercent: false,
+        detailShowVmInfo: false,
+        detailShowSwapInfo: false,
+        memBoardData: {
+            vmPercentData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            vmPrecentSetting: {
+                area: true,
+                yAxisType: ['percent']
+            },
+            swapPercentData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            swapPrecentSetting: {
+                area: true,
+                yAxisType: ['percent']
+            },
+            vmDetailData: {
+                columns: ['时间', 'total', 'avalible', 'used', 'free'],
+                rows: [
+                    
+                ]
+            },
+            vmDetailSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            },
+            swapDetailData: {
+                columns: ['时间', 'total', 'used', 'free', 'sin', 'sout'],
+                rows: [
+                    
+                ]
+            },
+            swapDetailSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            }
+        }
     },
     computed: {
         cpuFreqMaxLinePoint(){
@@ -133,6 +192,18 @@ var app = new Vue({
         },
         cpuPersentMaxLinePoint(){
             return this.defaultLonePoint * this.cpuPercentEnlargeMultiple
+        },
+        vmPercentMaxLinePoint(){
+            return this.defaultLonePoint * this.vmPercentEnlargeMultiple
+        },
+        swapPercentMaxLinePoint(){
+            return this.defaultLonePoint * this.swapPercentEnlargeMultiple
+        },
+        vmInfoMaxLinePoint(){
+            return this.defaultLonePoint * this.vmInfoEnlargeMultiple
+        },
+        swapInfoMaxLinePoint(){
+            return this.defaultLonePoint * this.swapInfoEnlargeMultiple
         }
     },
     methods: {
@@ -213,6 +284,7 @@ var app = new Vue({
                 this.netData.rows.push({ '时间': timeString, '收到数据': parseInt(responseNetData.bytes_recv/1024/1024, 10)})
             }
         },
+        // 上面是 DashBoard 的计算
         fillCpuBoardInfo(){
             let getCpuBoardAllData = this.getCpuBoardData
             setInterval(function(){
@@ -307,9 +379,15 @@ var app = new Vue({
             if (key == 1) {
                 this.dashBoardShow = true
                 this.cpuBoardShow = false
+                this.memBoardShow = false
             }else if(key == 2) {
                 this.cpuBoardShow = true
                 this.dashBoardShow = false
+                this.memBoardShow = false
+            }else if(key == 3){
+                this.cpuBoardShow = false
+                this.dashBoardShow = false
+                this.memBoardShow = true
             }
         },
         showBigCpuFreq() {
@@ -359,10 +437,88 @@ var app = new Vue({
         closeDetailCpuPercent(){
             this.detailShowCpuPercent = false
             this.cpuPercentEnlargeMultiple = this.minMultiple
-        }
+        },
+        // 上面是CPU Board 的计算
+        fillVmBoardInfo(){
+            let getMemBoardAllData = this.getMemBoardData
+            setInterval(function(){
+                getMemBoardAllData()
+            }, this.refreshMT)
+        },
+        getMemBoardData(){
+            if (!this.memBoardShow) {
+                return
+            }
 
-    },
+            this.$http.get("/data/memdashboard/").then(function(response){
+                let timeString = getNowTimeString()
+
+                let responseData = response.body.data
+                let responseMemData = responseData.mem_data
+
+                this.fillVmPercentData(timeString, responseMemData.vmem)
+                this.fillSwapPercentData(timeString, responseMemData.swap)
+                this.fillVmDetailData(timeString, responseMemData.vmem)
+                this.fillSwapDetailData(timeString, responseMemData.swap)
+            }, function(response){
+                console.log('服务异常', response)
+            });
+        },
+        fillVmPercentData(timeString, vmData){
+            this.memBoardData.vmPercentData.rows.push({ '时间': timeString, '使用率': (vmData.percent/100)})
+
+            this.memBoardData.vmPercentData.rows = sliceArrayLeftEndPoints(this.memBoardData.vmPercentData.rows, this.vmPercentMaxLinePoint)
+        },
+        fillSwapPercentData(timeString, swapData) {
+            this.memBoardData.swapPercentData.rows.push({ '时间': timeString, '使用率': (swapData.percent/100)})
+
+            this.memBoardData.swapPercentData.rows = sliceArrayLeftEndPoints(this.memBoardData.swapPercentData.rows, this.swapPercentMaxLinePoint)
+        },
+        fillVmDetailData(timeString, vmData) {
+            this.memBoardData.vmDetailData.rows.push({ '时间': timeString, 'total': vmData.total, 'avalible': vmData.avalible, 'used': vmData.used, 'free': vmData.free})
+
+            this.memBoardData.vmDetailData.rows = sliceArrayLeftEndPoints(this.memBoardData.vmDetailData.rows, this.vmInfoMaxLinePoint)
+        },
+        fillSwapDetailData(timeString, vmData) {
+            this.memBoardData.swapDetailData.rows.push({ '时间': timeString, 'total': vmData.total, 'sin': vmData.sin, 'sout': vmData.sout, 'used': vmData.used, 'free': vmData.free})
+
+            this.memBoardData.swapDetailData.rows = sliceArrayLeftEndPoints(this.memBoardData.swapDetailData.rows, this.swapInfoMaxLinePoint)
+        },
+        showBigVmPersent() {
+            this.bigShowVmPercent = true,
+            this.vmPercentEnlargeMultiple = this.maxMultiple
+        },
+        showBigSwapPercent() {
+            this.bigShowSwapPercent = true,
+            this.swapPercentEnlargeMultiple = this.maxMultiple
+        },
+        showDetailVmInfo(){
+            this.detailShowVmInfo = true,
+            this.vmInfoEnlargeMultiple = this.maxMultiple
+        },
+        showDetailSwapInfo(){
+            this.detailShowSwapInfo = true,
+            this.swapInfoEnlargeMultiple = this.maxMultiple
+        },
+        closeBigVmPercent() {
+            this.bigShowVmPercent = false,
+            this.vmPercentEnlargeMultiple = this.minMultiple
+        },
+        closeBigSwapPercent() {
+            this.bigShowSwapPercent = false,
+            this.swapPercentEnlargeMultiple = this.minMultiple
+        },
+        closeDetailVmInfo(){
+            this.detailShowVmInfo = false,
+            this.vmInfoEnlargeMultiple = this.maxMultiple
+        },
+        closeDetailSwapInfo(){
+            this.detailShowSwapInfo = false,
+            this.swapInfoEnlargeMultiple = this.minMultiple
+        }
+    }
 })
 
 app.countDashboardCpuTime()
 app.fillCpuBoardInfo()
+app.fillVmBoardInfo()

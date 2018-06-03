@@ -46,7 +46,7 @@
     border-right: none;
 }
 
-.dashboard, .cpuboard{
+.dashboard, .cpuboard, .memboard{
     flex: auto;
     display: flex;
     flex-wrap: wrap;

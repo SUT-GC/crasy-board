@@ -53,6 +53,10 @@ from service.net_service import (
     get_total_net_info
 )
 
+from service.memory_service import (
+    get_mem_info
+)
+
 app = Flask(__name__)
 log = Log.getLog(__name__, isPrint=True)
 
@@ -146,6 +150,21 @@ def cpu_dashboard():
     else:
         
         return send_file('templates/login.html')
+
+@app.route('/data/memdashboard/', methods=['GET'])
+def mem_dashboard():
+    log.info('mem dashboard')
+    if validate_login():
+        mem_data = get_mem_info()
+
+        result_data = {'mem_data': mem_data}
+        log.info('mem dashboard result: %s' % result_data)
+
+        return ResultUtils.get_result(200, result_data)
+    else:
+        
+        return send_file('templates/login.html')
+
 
 if __name__ == "__main__":
     app_conf = get_app_conf()

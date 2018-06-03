@@ -127,6 +127,40 @@
                             <ve-line :data="cpuBoardData.cpuTimesData" :settings="cpuBoardData.cpuTimesSetting"></ve-line>
                         </el-card>
                     </div>
+                    <div class="memboard" v-if="memBoardShow">
+                        <el-card class="one-card vm-board-use-percent">
+                            <div class="card-title">
+                                <span>内存 使用率</span>
+                                <span class="detail-info-buttons">
+                                    <el-button type="text" size="mini"  @click="showBigVmPersent"  round>放大</el-button>
+                                    <el-button type="text" size="mini" @click="showDetailVmInfo" round>详细</el-button>
+                                    <el-dialog title="内存 使用率" :visible.sync="bigShowVmPercent" class="big-board" width="90%" :before-close="closeBigVmPercent">
+                                        <ve-line :data="memBoardData.vmPercentData" :settings="memBoardData.vmPrecentSetting"></ve-line>
+                                    </el-dialog>
+                                    <el-dialog title="内存 使用详情" :visible.sync="detailShowVmInfo" class="big-board" width="90%" :before-close="closeDetailVmInfo">
+                                        <ve-line :data="memBoardData.vmDetailData" :settings="memBoardData.vmDetailSetting"></ve-line>
+                                    </el-dialog>
+                                </span>
+                            </div>
+                            <ve-line :data="memBoardData.vmPercentData" :settings="memBoardData.vmPrecentSetting"></ve-line>
+                        </el-card>
+                        <el-card class="one-card swap-board-use-percent">
+                            <div class="card-title">
+                                <span>交换空间 使用率</span>
+                                <span class="detail-info-buttons">
+                                    <el-button type="text" size="mini"  @click="showBigSwapPercent"  round>放大</el-button>
+                                    <el-button type="text" size="mini" @click="showDetailSwapInfo" round>详细</el-button>
+                                    <el-dialog title="交换空间 使用率" :visible.sync="bigShowSwapPercent" class="big-board" width="90%" :before-close="closeBigSwapPercent">
+                                        <ve-line :data="memBoardData.swapPercentData" :settings="memBoardData.swapPrecentSetting"></ve-line>
+                                    </el-dialog>
+                                    <el-dialog title="交换空间 使用详情" :visible.sync="detailShowSwapInfo" class="big-board" width="90%" :before-close="closeDetailSwapInfo">
+                                        <ve-line :data="memBoardData.swapDetailData" :settings="memBoardData.swapDetailSetting"></ve-line>
+                                    </el-dialog>
+                                </span>
+                            </div>
+                            <ve-line :data="memBoardData.swapPercentData" :settings="memBoardData.swapPrecentSetting"></ve-line>
+                        </el-card>
+                    </div>
                 </div>
             </div>
         </div>
