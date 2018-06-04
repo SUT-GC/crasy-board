@@ -40,12 +40,28 @@ def get_disk_io():
 
     return {'read_count': _get_human_size(sdiskio.read_count), 'write_count': _get_human_size(sdiskio.write_count), 'read_bytes': _get_human_size(sdiskio.read_bytes), 'write_bytes': _get_human_size(sdiskio.write_bytes)}
 
+
+def get_disk_info():
+    diskusage = get_path_disk_info('/')
+    all_disk_io = get_all_disk_io()
+    summ_disk_io = get_disk_io()
+    disk_partitions = get_disk_partitions()
+
+    return {
+        'disk_use': diskusage,
+        'disk_io_all': all_disk_io,
+        'disk_io': summ_disk_io,
+        'disk_part': disk_partitions
+    }
+
+
 def _get_human_size(size):
     return get_human_size(size, 'G', 2)
 
 if __name__ == "__main__":
-    print get_totle_disk_info()
-    # print get_disk_info('/data')
+    # print get_totle_disk_info()
+    # print get_path_disk_info('/')
     # print get_disk_partitions()
-    print get_all_disk_io()
-    print get_disk_io()
+    # print get_all_disk_io()
+    # print get_disk_io()
+    print get_disk_info()
