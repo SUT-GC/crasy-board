@@ -162,7 +162,22 @@
                         </el-card>
                     </div>
                     <div class="diskboard" v-if="diskBoardShow">
-                        
+                        <el-card class="one-card dick-board-use-percent">
+                            <div class="card-title">
+                                <span>磁盘 使用率</span>
+                                <span class="detail-info-buttons">
+                                    <el-button type="text" size="mini"  @click="showBigDiskPercent"  round>放大</el-button>
+                                    <el-button type="text" size="mini" @click="showDetailCpuPercent" round>详细</el-button>
+                                    <el-dialog title="磁盘 使用率" :visible.sync="bigShowDiskPercent" class="big-board" width="90%" :before-close="closeBigDiskPercent">
+                                        <ve-line :data="diskBoardData.diskPercentData" :settings="diskBoardData.diskPercentSetting"></ve-line>
+                                    </el-dialog>
+                                    <!-- <el-dialog title="CPU 使用率详情" :visible.sync="detailShowCpuPercent" class="big-boadr" width="90%" :before-close="closeDetailCpuPercent">
+                                        <ve-line :data="cpuBoardData.eveCpuPercentData" :settings="cpuBoardData.eveCpuPercentSetting"></ve-line>
+                                    </el-dialog> -->
+                                </span>
+                            </div>
+                            <ve-line :data="diskBoardData.diskPercentData" :settings="diskBoardData.diskPercentSetting"></ve-line>
+                        </el-card>
                     </div>
                 </div>
             </div>

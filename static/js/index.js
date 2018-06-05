@@ -12,6 +12,7 @@ var app = new Vue({
         swapPercentEnlargeMultiple:1,
         vmInfoEnlargeMultiple: 1,
         swapInfoEnlargeMultiple: 1,
+        diskPercentEnlargeMultiple: 1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -184,6 +185,19 @@ var app = new Vue({
         },
         // 以上为内存面板的数据
         diskBoardShow:false,
+        bigShowDiskPercent:false,
+        diskBoardData: {
+            diskPercentData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            diskPercentSetting: {
+                area: true,
+                yAxisType: ['percent']
+            }
+        }
     },
     computed: {
         cpuFreqMaxLinePoint(){
@@ -206,6 +220,9 @@ var app = new Vue({
         },
         swapInfoMaxLinePoint(){
             return this.defaultLonePoint * this.swapInfoEnlargeMultiple
+        },
+        diskPercentMaxLinePoint(){
+            return this.defaultLonePoint * this.diskPercentEnlargeMultiple
         }
     },
     methods: {
@@ -525,6 +542,42 @@ var app = new Vue({
         closeDetailSwapInfo(){
             this.detailShowSwapInfo = false,
             this.swapInfoEnlargeMultiple = this.minMultiple
+        },
+        // 一场为内存Board的计算
+        fillDiskBoardInfo(){
+            let getDiskBoardAllData = this.getDiskBoardData
+            setInterval(function(){
+                getDiskBoardAllData()
+            }, this.refreshMT)
+        },
+        getDiskBoardData(){
+            if (!this.diskBoardShow) {
+                return
+            }
+
+            this.$http.get("/data/diskdashboard/").then(function(response){
+                let timeString = getNowTimeString()
+
+                let responseData = response.body.data
+                let responseDiskData = responseData.disk_data
+
+                this.fillDiskPercentData(timeString, responseDiskData.disk_use)
+            }, function(response){
+                console.log('服务异常', response)
+            });
+        },
+        fillDiskPercentData(timeString, data) {
+            this.diskBoardData.diskPercentData.rows.push({ '时间': timeString, '使用率': (data.disk_percent/100)})
+
+            this.diskBoardData.diskPercentData.rows = sliceArrayLeftEndPoints(this.diskBoardData.diskPercentData.rows, this.diskPercentMaxLinePoint)
+        },
+        showBigDiskPercent() {
+            this.bigShowDiskPercent = true,
+            this.diskPercentEnlargeMultiple = this.maxMultiple
+        },
+        closeBigDiskPercent() {
+            this.bigShowDiskPercent = false,
+            this.diskPercentEnlargeMultiple = this.minMultiple
         }
     }
 })
@@ -532,3 +585,4 @@ var app = new Vue({
 app.countDashboardCpuTime()
 app.fillCpuBoardInfo()
 app.fillVmBoardInfo()
+app.fillDiskBoardInfo()

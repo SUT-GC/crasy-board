@@ -57,6 +57,10 @@ from service.memory_service import (
     get_mem_info
 )
 
+from service.disk_service import (
+    get_disk_info
+)
+
 app = Flask(__name__)
 log = Log.getLog(__name__, isPrint=True)
 
@@ -159,6 +163,21 @@ def mem_dashboard():
 
         result_data = {'mem_data': mem_data}
         log.info('mem dashboard result: %s' % result_data)
+
+        return ResultUtils.get_result(200, result_data)
+    else:
+        
+        return send_file('templates/login.html')
+
+
+@app.route('/data/diskdashboard/', methods=['GET'])
+def disk_dashboard():
+    log.info('disk dashboard')
+    if validate_login():
+        disk_data = get_disk_info()
+
+        result_data = {'disk_data': disk_data}
+        log.info('disk dashboard result: %s' % result_data)
 
         return ResultUtils.get_result(200, result_data)
     else:
