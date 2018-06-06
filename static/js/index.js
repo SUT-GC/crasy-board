@@ -13,6 +13,7 @@ var app = new Vue({
         vmInfoEnlargeMultiple: 1,
         swapInfoEnlargeMultiple: 1,
         diskPercentEnlargeMultiple: 1,
+        diskRWEnlargeMultiple: 1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -186,6 +187,9 @@ var app = new Vue({
         // 以上为内存面板的数据
         diskBoardShow:false,
         bigShowDiskPercent:false,
+        detailShowDiskPercent:false,
+        bigShowDiskRWInfo: false,
+        detailShowDiskRWInfo: false,
         diskBoardData: {
             diskPercentData: {
                 columns: ['时间', '使用率'],
@@ -196,6 +200,43 @@ var app = new Vue({
             diskPercentSetting: {
                 area: true,
                 yAxisType: ['percent']
+            },
+            detailDiskPercentData: {
+                columns: ['时间', 'total', 'used', 'free'],
+                rows: [
+                    
+                ]
+            },
+            detailDiskPercentSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            },
+            diskRWData: {
+                columns: ['时间', '写字节数', '写次数', '读字节数', '读次数'],
+                rows: [
+                    
+                ]
+            },
+            diskRWSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            },
+            detailDiskRWData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            detailDiskRWSetting: {
+
             }
         }
     },
@@ -223,6 +264,9 @@ var app = new Vue({
         },
         diskPercentMaxLinePoint(){
             return this.defaultLonePoint * this.diskPercentEnlargeMultiple
+        },
+        diskRWMaxLinePoint() {
+            return this.defaultLonePoint * this.diskRWEnlargeMultiple
         }
     },
     methods: {
@@ -562,14 +606,30 @@ var app = new Vue({
                 let responseDiskData = responseData.disk_data
 
                 this.fillDiskPercentData(timeString, responseDiskData.disk_use)
+                this.fillDiskPercentDetailData(timeString, responseDiskData.disk_use)
+                this.fillDiskRWData(timeString, responseDiskData.disk_io)
+                this.fillDiskRWDetailData(timeString, responseDiskData.disk_io_all)
             }, function(response){
                 console.log('服务异常', response)
             });
         },
         fillDiskPercentData(timeString, data) {
             this.diskBoardData.diskPercentData.rows.push({ '时间': timeString, '使用率': (data.disk_percent/100)})
-
+          
             this.diskBoardData.diskPercentData.rows = sliceArrayLeftEndPoints(this.diskBoardData.diskPercentData.rows, this.diskPercentMaxLinePoint)
+        },
+        fillDiskPercentDetailData(timeString, data) {
+            this.diskBoardData.detailDiskPercentData.rows.push({ '时间': timeString, 'total': data.disk_totle, 'used': data.disk_used, 'free': data.disk_free})
+          
+            this.diskBoardData.detailDiskPercentData.rows = sliceArrayLeftEndPoints(this.diskBoardData.detailDiskPercentData.rows, this.diskPercentMaxLinePoint)
+        },
+        fillDiskRWData(timeString, data) {
+            this.diskBoardData.diskRWData.rows.push({ '时间': timeString, '写字节数': data.write_bytes, '写次数': data.write_count, '读字节数': data.read_bytes, '读次数': data.read_count}) 
+          
+            this.diskBoardData.diskRWData.rows = sliceArrayLeftEndPoints(this.diskBoardData.diskRWData.rows, this.diskRWMaxLinePoint)
+        },
+        fillDiskRWDetailData(timeString, data) {
+
         },
         showBigDiskPercent() {
             this.bigShowDiskPercent = true,
@@ -578,7 +638,31 @@ var app = new Vue({
         closeBigDiskPercent() {
             this.bigShowDiskPercent = false,
             this.diskPercentEnlargeMultiple = this.minMultiple
-        }
+        },
+        showDetailCpuPercent() {
+            this.detailShowDiskPercent = true,
+            this.diskPercentEnlargeMultiple = this.maxMultiple
+        },
+        closeDetailDiskPercent() {
+            this.detailShowDiskPercent = false,
+            this.diskPercentEnlargeMultiple = this.minMultiple
+        },
+        showBigDiskRWInfo() {
+            this.bigShowDiskRWInfo = true,
+            this.diskRWEnlargeMultiple = this.maxMultiple
+        },
+        closeBigDiskRWInfo() {
+            this.bigShowDiskRWInfo = false,
+            this.diskRWEnlargeMultiple = this.minMultiple
+        },
+        showDetailDiskRWInfo() {
+            this.detailShowDiskRWInfo = true,
+            this.diskRWEnlargeMultiple = this.maxMultiple
+        },
+        closeDetailDiskRWInfo() {
+            this.detailShowDiskRWInfo = false,
+            this.diskRWEnlargeMultiple = this.minMultiple
+        },
     }
 })
 

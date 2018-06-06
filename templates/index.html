@@ -171,12 +171,28 @@
                                     <el-dialog title="磁盘 使用率" :visible.sync="bigShowDiskPercent" class="big-board" width="90%" :before-close="closeBigDiskPercent">
                                         <ve-line :data="diskBoardData.diskPercentData" :settings="diskBoardData.diskPercentSetting"></ve-line>
                                     </el-dialog>
-                                    <!-- <el-dialog title="CPU 使用率详情" :visible.sync="detailShowCpuPercent" class="big-boadr" width="90%" :before-close="closeDetailCpuPercent">
-                                        <ve-line :data="cpuBoardData.eveCpuPercentData" :settings="cpuBoardData.eveCpuPercentSetting"></ve-line>
-                                    </el-dialog> -->
+                                    <el-dialog title="磁盘 使用率详情" :visible.sync="detailShowDiskPercent" class="big-boadr" width="90%" :before-close="closeDetailDiskPercent">
+                                        <ve-line :data="diskBoardData.detailDiskPercentData" :settings="diskBoardData.detailDiskPercentSetting"></ve-line>
+                                    </el-dialog>
                                 </span>
                             </div>
                             <ve-line :data="diskBoardData.diskPercentData" :settings="diskBoardData.diskPercentSetting"></ve-line>
+                        </el-card>
+                        <el-card class="one-card dick-board-use-percent">
+                            <div class="card-title">
+                                <span>磁盘 读写数据</span>
+                                <span class="detail-info-buttons">
+                                    <el-button type="text" size="mini"  @click="showBigDiskRWInfo"  round>放大</el-button>
+                                    <el-button type="text" size="mini" @click="showDetailDiskRWInfo" round>详细</el-button>
+                                    <el-dialog title="磁盘 使用率" :visible.sync="bigShowDiskRWInfo" class="big-board" width="90%" :before-close="closeBigDiskRWInfo">
+                                        <ve-line :data="diskBoardData.diskRWData" :settings="diskBoardData.diskRWSetting"></ve-line>
+                                    </el-dialog>
+                                    <el-dialog title="磁盘 使用率详情" :visible.sync="detailShowDiskRWInfo" class="big-boadr" width="90%" :before-close="closeDetailDiskRWInfo">
+                                        <ve-line :data="diskBoardData.detailDiskRWData" :settings="diskBoardData.detailDiskRWSetting"></ve-line>
+                                    </el-dialog>
+                                </span>
+                            </div>
+                            <ve-line :data="diskBoardData.diskRWData" :settings="diskBoardData.diskRWSetting"></ve-line>
                         </el-card>
                     </div>
                 </div>
