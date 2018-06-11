@@ -237,7 +237,10 @@ var app = new Vue({
             },
             detailDiskRWSetting: {
 
-            }
+            },
+            detailAllDiskRWData: [
+
+            ]
         }
     },
     computed: {
@@ -629,7 +632,18 @@ var app = new Vue({
             this.diskBoardData.diskRWData.rows = sliceArrayLeftEndPoints(this.diskBoardData.diskRWData.rows, this.diskRWMaxLinePoint)
         },
         fillDiskRWDetailData(timeString, data) {
+            for(let i = 0; i < data.length; i++) {
+                disk_io = data[i]
+                if (this.diskBoardData.detailAllDiskRWData.length < i + 1) {
+                    this.diskBoardData.detailAllDiskRWData.push({'columns': ['时间', '写字节数', '写次数', '读字节数','读次数'], 'rows': [{'时间': timeString, '写字节数': disk_io.write_bytes, '写次数': disk_io.write_count, '读字节数': disk_io.read_bytes, '读次数': disk_io.read_count}], 'name': disk_io.name})
+                }else{
+                    this.diskBoardData.detailAllDiskRWData[i].rows.push({'时间': timeString, '写字节数': disk_io.write_bytes, '写次数': disk_io.write_count, '读字节数': disk_io.read_bytes, '读次数': disk_io.read_count})
+                }
+            }
 
+            for(let index = 0; index < this.diskBoardData.detailAllDiskRWData.length; index++) {
+                this.diskBoardData.detailAllDiskRWData[index].rows = sliceArrayLeftEndPoints(this.diskBoardData.detailAllDiskRWData[index].rows, this.diskRWMaxLinePoint)
+            }
         },
         showBigDiskPercent() {
             this.bigShowDiskPercent = true,

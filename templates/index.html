@@ -187,8 +187,9 @@
                                     <el-dialog title="磁盘 使用率" :visible.sync="bigShowDiskRWInfo" class="big-board" width="90%" :before-close="closeBigDiskRWInfo">
                                         <ve-line :data="diskBoardData.diskRWData" :settings="diskBoardData.diskRWSetting"></ve-line>
                                     </el-dialog>
-                                    <el-dialog title="磁盘 使用率详情" :visible.sync="detailShowDiskRWInfo" class="big-boadr" width="90%" :before-close="closeDetailDiskRWInfo">
-                                        <ve-line :data="diskBoardData.detailDiskRWData" :settings="diskBoardData.detailDiskRWSetting"></ve-line>
+                                    <el-dialog title="磁盘 读写数据详情" v-for="detailDiskRWData in diskBoardData.detailAllDiskRWData" :visible.sync="detailShowDiskRWInfo" class="big-boadr" width="90%" :before-close="closeDetailDiskRWInfo">
+                                            <h2>{{ detailDiskRWData.name }}</h2>
+                                        <ve-line :data="detailDiskRWData" :settings="diskBoardData.detailDiskRWSetting"></ve-line>
                                     </el-dialog>
                                 </span>
                             </div>
