@@ -12,6 +12,8 @@ var app = new Vue({
         swapPercentEnlargeMultiple:1,
         vmInfoEnlargeMultiple: 1,
         swapInfoEnlargeMultiple: 1,
+        diskPercentEnlargeMultiple: 1,
+        diskRWEnlargeMultiple: 1,
         message: "hello world",
         diskData: {
             columns: ['类型', '大小'],
@@ -181,6 +183,64 @@ var app = new Vue({
                     }
                 }
             }
+        },
+        // 以上为内存面板的数据
+        diskBoardShow:false,
+        bigShowDiskPercent:false,
+        detailShowDiskPercent:false,
+        bigShowDiskRWInfo: false,
+        detailShowDiskRWInfo: false,
+        diskBoardData: {
+            diskPercentData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            diskPercentSetting: {
+                area: true,
+                yAxisType: ['percent']
+            },
+            detailDiskPercentData: {
+                columns: ['时间', 'total', 'used', 'free'],
+                rows: [
+                    
+                ]
+            },
+            detailDiskPercentSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            },
+            diskRWData: {
+                columns: ['时间', '写字节数', '写次数', '读字节数', '读次数'],
+                rows: [
+                    
+                ]
+            },
+            diskRWSetting: {
+                yAxisName: ['GB'],
+                label: {
+                    normal: {
+                        show: true
+                    }
+                }
+            },
+            detailDiskRWData: {
+                columns: ['时间', '使用率'],
+                rows: [
+                    
+                ]
+            },
+            detailDiskRWSetting: {
+
+            },
+            detailAllDiskRWData: [
+
+            ]
         }
     },
     computed: {
@@ -204,6 +264,12 @@ var app = new Vue({
         },
         swapInfoMaxLinePoint(){
             return this.defaultLonePoint * this.swapInfoEnlargeMultiple
+        },
+        diskPercentMaxLinePoint(){
+            return this.defaultLonePoint * this.diskPercentEnlargeMultiple
+        },
+        diskRWMaxLinePoint() {
+            return this.defaultLonePoint * this.diskRWEnlargeMultiple
         }
     },
     methods: {
@@ -380,14 +446,22 @@ var app = new Vue({
                 this.dashBoardShow = true
                 this.cpuBoardShow = false
                 this.memBoardShow = false
+                this.diskBoardShow = false
             }else if(key == 2) {
                 this.cpuBoardShow = true
                 this.dashBoardShow = false
                 this.memBoardShow = false
+                this.diskBoardShow = false
             }else if(key == 3){
                 this.cpuBoardShow = false
                 this.dashBoardShow = false
                 this.memBoardShow = true
+                this.diskBoardShow = false
+            }else if(key == 4) {
+                this.cpuBoardShow = false
+                this.dashBoardShow = false
+                this.memBoardShow = false
+                this.diskBoardShow = true
             }
         },
         showBigCpuFreq() {
@@ -515,10 +589,98 @@ var app = new Vue({
         closeDetailSwapInfo(){
             this.detailShowSwapInfo = false,
             this.swapInfoEnlargeMultiple = this.minMultiple
-        }
+        },
+        // 一场为内存Board的计算
+        fillDiskBoardInfo(){
+            let getDiskBoardAllData = this.getDiskBoardData
+            setInterval(function(){
+                getDiskBoardAllData()
+            }, this.refreshMT)
+        },
+        getDiskBoardData(){
+            if (!this.diskBoardShow) {
+                return
+            }
+
+            this.$http.get("/data/diskdashboard/").then(function(response){
+                let timeString = getNowTimeString()
+
+                let responseData = response.body.data
+                let responseDiskData = responseData.disk_data
+
+                this.fillDiskPercentData(timeString, responseDiskData.disk_use)
+                this.fillDiskPercentDetailData(timeString, responseDiskData.disk_use)
+                this.fillDiskRWData(timeString, responseDiskData.disk_io)
+                this.fillDiskRWDetailData(timeString, responseDiskData.disk_io_all)
+            }, function(response){
+                console.log('服务异常', response)
+            });
+        },
+        fillDiskPercentData(timeString, data) {
+            this.diskBoardData.diskPercentData.rows.push({ '时间': timeString, '使用率': (data.disk_percent/100)})
+          
+            this.diskBoardData.diskPercentData.rows = sliceArrayLeftEndPoints(this.diskBoardData.diskPercentData.rows, this.diskPercentMaxLinePoint)
+        },
+        fillDiskPercentDetailData(timeString, data) {
+            this.diskBoardData.detailDiskPercentData.rows.push({ '时间': timeString, 'total': data.disk_totle, 'used': data.disk_used, 'free': data.disk_free})
+          
+            this.diskBoardData.detailDiskPercentData.rows = sliceArrayLeftEndPoints(this.diskBoardData.detailDiskPercentData.rows, this.diskPercentMaxLinePoint)
+        },
+        fillDiskRWData(timeString, data) {
+            this.diskBoardData.diskRWData.rows.push({ '时间': timeString, '写字节数': data.write_bytes, '写次数': data.write_count, '读字节数': data.read_bytes, '读次数': data.read_count}) 
+          
+            this.diskBoardData.diskRWData.rows = sliceArrayLeftEndPoints(this.diskBoardData.diskRWData.rows, this.diskRWMaxLinePoint)
+        },
+        fillDiskRWDetailData(timeString, data) {
+            for(let i = 0; i < data.length; i++) {
+                disk_io = data[i]
+                if (this.diskBoardData.detailAllDiskRWData.length < i + 1) {
+                    this.diskBoardData.detailAllDiskRWData.push({'columns': ['时间', '写字节数', '写次数', '读字节数','读次数'], 'rows': [{'时间': timeString, '写字节数': disk_io.write_bytes, '写次数': disk_io.write_count, '读字节数': disk_io.read_bytes, '读次数': disk_io.read_count}], 'name': disk_io.name})
+                }else{
+                    this.diskBoardData.detailAllDiskRWData[i].rows.push({'时间': timeString, '写字节数': disk_io.write_bytes, '写次数': disk_io.write_count, '读字节数': disk_io.read_bytes, '读次数': disk_io.read_count})
+                }
+            }
+
+            for(let index = 0; index < this.diskBoardData.detailAllDiskRWData.length; index++) {
+                this.diskBoardData.detailAllDiskRWData[index].rows = sliceArrayLeftEndPoints(this.diskBoardData.detailAllDiskRWData[index].rows, this.diskRWMaxLinePoint)
+            }
+        },
+        showBigDiskPercent() {
+            this.bigShowDiskPercent = true,
+            this.diskPercentEnlargeMultiple = this.maxMultiple
+        },
+        closeBigDiskPercent() {
+            this.bigShowDiskPercent = false,
+            this.diskPercentEnlargeMultiple = this.minMultiple
+        },
+        showDetailCpuPercent() {
+            this.detailShowDiskPercent = true,
+            this.diskPercentEnlargeMultiple = this.maxMultiple
+        },
+        closeDetailDiskPercent() {
+            this.detailShowDiskPercent = false,
+            this.diskPercentEnlargeMultiple = this.minMultiple
+        },
+        showBigDiskRWInfo() {
+            this.bigShowDiskRWInfo = true,
+            this.diskRWEnlargeMultiple = this.maxMultiple
+        },
+        closeBigDiskRWInfo() {
+            this.bigShowDiskRWInfo = false,
+            this.diskRWEnlargeMultiple = this.minMultiple
+        },
+        showDetailDiskRWInfo() {
+            this.detailShowDiskRWInfo = true,
+            this.diskRWEnlargeMultiple = this.maxMultiple
+        },
+        closeDetailDiskRWInfo() {
+            this.detailShowDiskRWInfo = false,
+            this.diskRWEnlargeMultiple = this.minMultiple
+        },
     }
 })
 
 app.countDashboardCpuTime()
 app.fillCpuBoardInfo()
 app.fillVmBoardInfo()
+app.fillDiskBoardInfo()
