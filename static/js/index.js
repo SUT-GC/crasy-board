@@ -241,7 +241,9 @@ var app = new Vue({
             detailAllDiskRWData: [
 
             ]
-        }
+        },
+        // 以上为Disk面板的数据
+        netBoardShow: false
     },
     computed: {
         cpuFreqMaxLinePoint(){
@@ -447,21 +449,31 @@ var app = new Vue({
                 this.cpuBoardShow = false
                 this.memBoardShow = false
                 this.diskBoardShow = false
+                this.netBoardShow = false
             }else if(key == 2) {
                 this.cpuBoardShow = true
                 this.dashBoardShow = false
                 this.memBoardShow = false
                 this.diskBoardShow = false
+                this.netBoardShow = false
             }else if(key == 3){
                 this.cpuBoardShow = false
                 this.dashBoardShow = false
                 this.memBoardShow = true
                 this.diskBoardShow = false
+                this.netBoardShow = false
             }else if(key == 4) {
                 this.cpuBoardShow = false
                 this.dashBoardShow = false
                 this.memBoardShow = false
                 this.diskBoardShow = true
+                this.netBoardShow = false
+            }else if(key == 5) {
+                this.cpuBoardShow = false
+                this.dashBoardShow = false
+                this.memBoardShow = false
+                this.diskBoardShow = false
+                this.netBoardShow = true
             }
         },
         showBigCpuFreq() {
